@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <curl/curl.h>
 
 #include "curl_wrapper.h"
@@ -26,7 +27,9 @@ int main(int argc, char ** argv)
 	long int mal_data_items_start = find_in_text("data-items=\"[{", mal_page->content, 0);
 	long int mal_data_items_end = find_in_text("\" data-broadcasts", mal_page->content, mal_data_items_start);
 
-	char * mal_data_items = slice_text(mal_data_items_start, mal_data_items_end, mal_page->content);
+	char * mal_data_items = slice_text(mal_data_items_start + strlen("data-items=\"[{"), mal_data_items_end, mal_page->content);
+
+	mal_data_items = replace_all("&quot;", "\"", mal_data_items);
 
 	printf("%s", mal_data_items);
 
