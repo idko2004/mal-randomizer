@@ -9,6 +9,10 @@ NOCOLOR="\033[0m"
 
 mkdir -p $MATERIALS
 
+echo -e "${YELLOW}Generating GTK UI${NOCOLOR}"
+#This generates the file ui/gtk_builder_ui.h from gtkbuilder.ui, basically embeds the xml ui file into the program.
+node ui/generate_ui_in_header.js
+
 echo -e "${YELLOW}Compiling cJSON${NOCOLOR}"
 gcc -c cJSON/cJSON.c -o "${MATERIALS}/cJSON.o"
 
@@ -25,7 +29,7 @@ echo -e "${YELLOW}Compiling process_anime${NOCOLOR}"
 gcc -c process_anime.c -o "${MATERIALS}/process_anime.o"
 
 echo -e "${YELLOW}Compiling main${NOCOLOR}"
-gcc -lcurl "${MATERIALS}/cJSON.o" "${MATERIALS}/strarr.o" "${MATERIALS}/curl_wrapper.o" "${MATERIALS}/text_parser.o" "${MATERIALS}/process_anime.o" main.c -o "${BUILD}/mal-randomizer"
+gcc -lcurl `pkg-config --cflags --libs gtk+-3.0` "${MATERIALS}/cJSON.o" "${MATERIALS}/strarr.o" "${MATERIALS}/curl_wrapper.o" "${MATERIALS}/text_parser.o" "${MATERIALS}/process_anime.o" main.c -o "${BUILD}/mal-randomizer"
 
 if [ $? -eq 0 ]; then
 	echo -e "${GREEN}Done!${NOCOLOR}"

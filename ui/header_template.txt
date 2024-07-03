@@ -1,0 +1,7 @@
+#ifndef GTKBUILDERUIH  /* Include guard */
+#define GTKBUILDERUIH
+
+char * gtk_main_ui_str =
+"{UI_GOES_HERE}";
+
+#endif

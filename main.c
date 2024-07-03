@@ -2,9 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <curl/curl.h>
+#include <gtk/gtk.h>
 
 #include "cJSON/cJSON.h"
 
+#include "ui/gtk_builder_ui.h"
 #include "curl_wrapper.h"
 #include "text_parser.h"
 #include "process_anime.h"
@@ -12,6 +14,25 @@
 
 int main(int argc, char ** argv)
 {
+	GtkBuilder * builder;
+	GError * error = NULL;
+
+	gtk_init(&argc, &argv);
+
+	builder = gtk_builder_new();
+	if(gtk_builder_add_from_string(builder, gtk_main_ui_str, strlen(gtk_main_ui_str), &error) == 0)
+	{
+		fprintf(stderr, "[ERROR] Failed to create gtk builder: %s.\n", error->message);
+		return 1;
+	}
+
+	GObject * window = gtk_builder_get_object(builder, "window");
+	g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+
+	gtk_main();
+
+
+	return 0;
 	if(curl_global_init(CURL_GLOBAL_DEFAULT) != 0)
 	{
 		fprintf(stderr, "[ERROR] main: failed to initialize curl globally.\n");
