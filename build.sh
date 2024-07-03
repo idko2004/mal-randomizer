@@ -15,8 +15,11 @@ gcc -c curl_wrapper.c -o "${MATERIALS}/curl_wrapper.o"
 echo -e "${YELLOW}Compiling text_parser${NOCOLOR}"
 gcc -c text_parser.c -o "${MATERIALS}/text_parser.o"
 
+echo -e "${YELLOW}Compiling cJSON${NOCOLOR}"
+gcc -c cJSON/cJSON.c -o "${MATERIALS}/cJSON.o"
+
 echo -e "${YELLOW}Compiling main${NOCOLOR}"
-gcc -lcurl "${MATERIALS}/curl_wrapper.o" "${MATERIALS}/text_parser.o" main.c -o "${BUILD}/mal-randomizer"
+gcc -lcurl "${MATERIALS}/cJSON.o" "${MATERIALS}/curl_wrapper.o" "${MATERIALS}/text_parser.o" main.c -o "${BUILD}/mal-randomizer"
 
 if [ $? -eq 0 ]; then
 	echo -e "${GREEN}Done!${NOCOLOR}"

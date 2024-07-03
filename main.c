@@ -3,6 +3,8 @@
 #include <string.h>
 #include <curl/curl.h>
 
+#include "cJSON/cJSON.h"
+
 #include "curl_wrapper.h"
 #include "text_parser.h"
 
@@ -24,15 +26,25 @@ int main(int argc, char ** argv)
 
 	//printf("%s", mal_page->content);
 
-	long int mal_data_items_start = find_in_text("data-items=\"[{", mal_page->content, 0);
+	long int mal_data_items_start = find_in_text("data-items=\"", mal_page->content, 0);
 	long int mal_data_items_end = find_in_text("\" data-broadcasts", mal_page->content, mal_data_items_start);
 
-	char * mal_data_items = slice_text(mal_data_items_start + strlen("data-items=\"[{"), mal_data_items_end, mal_page->content);
+	char * mal_data_items = slice_text(mal_data_items_start + strlen("data-items=\""), mal_data_items_end, mal_page->content);
 
 	mal_data_items = replace_all("&quot;", "\"", mal_data_items);
 
-	printf("%s", mal_data_items);
+	fprintf(stderr, "[INFO] starting to parse json.\n");
 
+	cJSON * mal_json = cJSON_Parse(mal_data_items);
+
+	fprintf(stderr, "[INFO] json parsed.\n");
+
+	char * string = cJSON_Print(mal_json);
+
+	printf("%s", string);
+
+	free(mal_data_items);
+	cJSON_Delete(mal_json);
 	free_CurlResponse(mal_page);
 	curl_global_cleanup();
 
