@@ -12,42 +12,8 @@
 #include "process_anime.h"
 #include "strarr.h"
 
-void clickGoButton(GtkWidget * widget, void * callback_arg)
-{
-	fprintf(stderr, "[INFO] Go button was clicked.\n");
 
-	GObject * username_entry = gtk_builder_get_object(GTK_BUILDER(callback_arg), "username-entry");
-	if(username_entry == NULL)
-	{
-		fprintf(stderr, "[ERROR] clickGoButton: Failed to get username entry from builder.\n");
-		return;
-	}
-
-	const char * username = gtk_entry_get_text(GTK_ENTRY(username_entry));
-	if(username == NULL)
-	{
-		fprintf(stderr, "[ERROR] clickGoButton: Failed to get the contents of username entry.\n");
-		return;
-	}
-	
-	GObject * list_combobox = gtk_builder_get_object(GTK_BUILDER(callback_arg), "anime_list_type");
-	if(username_entry == NULL)
-	{
-		fprintf(stderr, "[ERROR] clickGoButton: Failed to get list entry from builder.\n");
-		return;
-	}
-	int list_selected = gtk_combo_box_get_active(GTK_COMBO_BOX(list_combobox));
-	if(list_selected == -1)
-	{
-		fprintf(stderr, "[ERROR] clickGoButton: Invalid combobox active.\n");
-		return;
-	}
-
-	if(list_selected == 5) list_selected = 6; //Por algún motivo, en myanimelist el status 5 está vacío.
-	fprintf(stderr, "%s\n%i\n", username, list_selected);
-}
-
-int startDoingTheStuff(char * username, int status)
+int startDoingTheStuff(const char * username, int status, GtkBuilder * builder)
 {
 	if(curl_global_init(CURL_GLOBAL_DEFAULT) != 0)
 	{
@@ -55,7 +21,14 @@ int startDoingTheStuff(char * username, int status)
 		return 1;
 	}
 
-	CurlResponse * mal_page = curlw_get_as_text("https://myanimelist.net/animelist/idko2004?status=6");
+	char * url_base = "https://myanimelist.net/animelist/%s?status=%i";
+
+	char * url = malloc(sizeof(char) * strlen(url_base) + strlen(username));
+	sprintf(url, url_base, username, status);
+
+	fprintf(stderr, "[INFO] url = %s", url);
+
+	CurlResponse * mal_page = curlw_get_as_text(url);
 
 	if(mal_page == NULL)
 	{
@@ -109,6 +82,43 @@ int startDoingTheStuff(char * username, int status)
 	curl_global_cleanup();
 
 	return 0;
+}
+
+void clickGoButton(GtkWidget * widget, void * callback_arg)
+{
+	fprintf(stderr, "[INFO] Go button was clicked.\n");
+
+	GObject * username_entry = gtk_builder_get_object(GTK_BUILDER(callback_arg), "username-entry");
+	if(username_entry == NULL)
+	{
+		fprintf(stderr, "[ERROR] clickGoButton: Failed to get username entry from builder.\n");
+		return;
+	}
+
+	const char * username = gtk_entry_get_text(GTK_ENTRY(username_entry));
+	if(username == NULL)
+	{
+		fprintf(stderr, "[ERROR] clickGoButton: Failed to get the contents of username entry.\n");
+		return;
+	}
+	
+	GObject * list_combobox = gtk_builder_get_object(GTK_BUILDER(callback_arg), "anime_list_type");
+	if(username_entry == NULL)
+	{
+		fprintf(stderr, "[ERROR] clickGoButton: Failed to get list entry from builder.\n");
+		return;
+	}
+	int list_selected = gtk_combo_box_get_active(GTK_COMBO_BOX(list_combobox));
+	if(list_selected == -1)
+	{
+		fprintf(stderr, "[ERROR] clickGoButton: Invalid combobox active.\n");
+		return;
+	}
+
+	if(list_selected == 5) list_selected = 6; //Por algún motivo, en myanimelist el status 5 está vacío.
+	fprintf(stderr, "[INFO] username: %s\n[INFO] list: %i\n", username, list_selected);
+
+	startDoingTheStuff(username, list_selected, GTK_BUILDER(callback_arg));
 }
 
 int main(int argc, char ** argv)
