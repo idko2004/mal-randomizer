@@ -55,12 +55,12 @@
 								<property name="visible">True</property>
 								<property name="active">0</property>
 								<items>
-									<item id="anime_list_type_option_plan_to_watch">Plan to watch</item>
 									<item id="anime_list_type_option_all">All anime</item>
+									<item id="anime_list_type_option_currently_watching">Currently watching</item>
 									<item id="anime_list_type_option_completed">Completed</item>
 									<item id="anime_list_type_option_on_hold">On hold</item>
-									<item id="anime_list_type_option_currently_watching">Currently watching</item>
 									<item id="anime_list_type_option_dropped">Dropped</item>
+									<item id="anime_list_type_option_plan_to_watch">Plan to watch</item>
 								</items>
 							</object>
 							<packing>

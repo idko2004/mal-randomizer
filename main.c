@@ -12,27 +12,43 @@
 #include "process_anime.h"
 #include "strarr.h"
 
-int main(int argc, char ** argv)
+void clickGoButton(GtkWidget * widget, void * callback_arg)
 {
-	GtkBuilder * builder;
-	GError * error = NULL;
+	fprintf(stderr, "[INFO] Go button was clicked.\n");
 
-	gtk_init(&argc, &argv);
-
-	builder = gtk_builder_new();
-	if(gtk_builder_add_from_string(builder, gtk_main_ui_str, strlen(gtk_main_ui_str), &error) == 0)
+	GObject * username_entry = gtk_builder_get_object(GTK_BUILDER(callback_arg), "username-entry");
+	if(username_entry == NULL)
 	{
-		fprintf(stderr, "[ERROR] Failed to create gtk builder: %s.\n", error->message);
-		return 1;
+		fprintf(stderr, "[ERROR] clickGoButton: Failed to get username entry from builder.\n");
+		return;
 	}
 
-	GObject * window = gtk_builder_get_object(builder, "window");
-	g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+	const char * username = gtk_entry_get_text(GTK_ENTRY(username_entry));
+	if(username == NULL)
+	{
+		fprintf(stderr, "[ERROR] clickGoButton: Failed to get the contents of username entry.\n");
+		return;
+	}
+	
+	GObject * list_combobox = gtk_builder_get_object(GTK_BUILDER(callback_arg), "anime_list_type");
+	if(username_entry == NULL)
+	{
+		fprintf(stderr, "[ERROR] clickGoButton: Failed to get list entry from builder.\n");
+		return;
+	}
+	int list_selected = gtk_combo_box_get_active(GTK_COMBO_BOX(list_combobox));
+	if(list_selected == -1)
+	{
+		fprintf(stderr, "[ERROR] clickGoButton: Invalid combobox active.\n");
+		return;
+	}
 
-	gtk_main();
+	if(list_selected == 5) list_selected = 6; //Por algún motivo, en myanimelist el status 5 está vacío.
+	fprintf(stderr, "%s\n%i\n", username, list_selected);
+}
 
-
-	return 0;
+int startDoingTheStuff(char * username, int status)
+{
 	if(curl_global_init(CURL_GLOBAL_DEFAULT) != 0)
 	{
 		fprintf(stderr, "[ERROR] main: failed to initialize curl globally.\n");
@@ -91,6 +107,31 @@ int main(int argc, char ** argv)
 	cJSON_Delete(mal_json);
 	free_CurlResponse(mal_page);
 	curl_global_cleanup();
+
+	return 0;
+}
+
+int main(int argc, char ** argv)
+{
+	GtkBuilder * builder;
+	GError * error = NULL;
+
+	gtk_init(&argc, &argv);
+
+	builder = gtk_builder_new();
+	if(gtk_builder_add_from_string(builder, gtk_main_ui_str, strlen(gtk_main_ui_str), &error) == 0)
+	{
+		fprintf(stderr, "[ERROR] Failed to create gtk builder: %s.\n", error->message);
+		return 1;
+	}
+
+	GObject * window = gtk_builder_get_object(builder, "window");
+	g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+
+	GObject * button = gtk_builder_get_object(builder, "goButton");
+	g_signal_connect(button, "clicked", G_CALLBACK(clickGoButton), builder);
+
+	gtk_main();
 
 	return 0;
 }
