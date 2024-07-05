@@ -128,19 +128,33 @@ int show_random_anime()
 	char * jp_name = replace_all("&#039;", "'", jp_name_bad);
 	char * en_name = replace_all("&#039;", "'", en_name_bad);
 
+	//Copiar los nombres porque si no parece que da problemas con gtk a veces.
+	char * jp_name_copy = malloc(sizeof(char) * strlen(jp_name) + 1);
+	char * en_name_copy = malloc(sizeof(char) * strlen(en_name) + 1);
+	if(jp_name_copy == NULL || en_name_copy == NULL)
+	{
+		fprintf(stderr, "[ERROR] show_random_anime: failed to allocate memory to copy anime names.\n");
+		return 1;
+	}
+	strcpy(jp_name_copy, jp_name);
+	strcpy(en_name_copy, en_name);
+
 	const char * markup_format_jp = "<span font_weight=\"bold\" font_size=\"16000\">%s</span>";
-	char * markup_jp = g_markup_printf_escaped(markup_format_jp, jp_name);
+	char * markup_jp = g_markup_printf_escaped(markup_format_jp, jp_name_copy);
 	gtk_label_set_markup(GTK_LABEL(label_jp), markup_jp);
 	g_free(markup_jp);
 
 	const char * markup_format_en = "<span font_size=\"12000\">%s</span>";
-	char * markup_en = g_markup_printf_escaped(markup_format_en, en_name);
+	char * markup_en = g_markup_printf_escaped(markup_format_en, en_name_copy);
 	gtk_label_set_markup(GTK_LABEL(label_en), markup_en);
 	g_free(markup_en);
 
+/*
 	free(jp_name);
 	free(en_name);
-
+	free(jp_name_copy);
+	free(en_name_copy);
+*/
 	index_anime = i;
 
 	return 0;
