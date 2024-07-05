@@ -6,7 +6,7 @@
 
 long int find_in_text(char * s, char * input, long int start_at)
 {
-	//fprintf(stderr, "[INFO] find_in_text: Trying to find %s\n", s);
+	fprintf(stderr, "[INFO] find_in_text: Trying to find %s\n", s);
 
 	long int s_length = strlen(s);
 	long int input_length = strlen(input);
@@ -22,7 +22,7 @@ long int find_in_text(char * s, char * input, long int start_at)
 				matches++;
 				if(matches == s_length - 1)
 				{
-					//fprintf(stderr, "[INFO] find_in_text: Found something at index %li\n", i);
+					fprintf(stderr, "[INFO] find_in_text: Found something at index %li\n", i);
 					return i;
 				}
 			}
@@ -36,6 +36,16 @@ long int find_in_text(char * s, char * input, long int start_at)
 
 char * slice_text(long int from, long int to, char * input)
 {
+	fprintf(stderr, "[INFO] slicing text, from %li to %li in '%s'\n", from, to, input);
+
+	if(from == to)
+	{
+		fprintf(stderr, "[ERROR?] slice_text: start and end are the same, returning empty string\n");
+		char * result = malloc(sizeof(char));
+		result[0] = '\0';
+		return result;
+	}
+
 	char * result = malloc(sizeof(char) * (to - from) + 1);
 
 	if(result == NULL)
@@ -53,12 +63,14 @@ char * slice_text(long int from, long int to, char * input)
 char * replace_text(char * target, char * replace_with, char * text)
 {
 	long int target_start = find_in_text(target, text, 0);
+	fprintf(stderr, "[INFO] replace_text: start of target is in %li\n", target_start);
 	if(target_start == -1)
 	{
 		fprintf(stderr, "[INFO] replace_text: No %s left in text.\n", target);
 		return NULL;
 	}
 	long int target_end = target_start + strlen(target);
+	fprintf(stderr, "[INFO] replace_text: end of target should be in %li\n", target_end);
 
 	char * new_text = malloc(sizeof(char) * strlen(text));
 	if(new_text == NULL)
@@ -74,14 +86,20 @@ char * replace_text(char * target, char * replace_with, char * text)
 		fprintf(stderr, "[ERROR] replace_text: Couldn't allocate memory for slicing text.\n");
 		return NULL;
 	}
+	fprintf(stderr, "[INFO] replace_text: before text currently is: '%s'\n", before_text);
+	fprintf(stderr, "[INFO] replace_text: after text currently is: '%s'\n", after_text);
 
 	strcpy(new_text, before_text);
 	int length = target_start;
+	fprintf(stderr, "[INFO] replace_text: before text copied, length is %i\n", length);
 	strcpy(new_text + length, replace_with);
 	length += strlen(replace_with);
+	fprintf(stderr, "[INFO] replace_text: replace with copied, length is %i\n", length);
 	strcpy(new_text + length, after_text);
 	length += strlen(after_text);
+	fprintf(stderr, "[INFO] replace_text: after text copied, length is %i\n", length);
 	new_text[length] = '\0';
+	fprintf(stderr, "[INFO] replace_text: result: '%s'\n", new_text);
 
 	free(before_text);
 	free(after_text);
@@ -102,7 +120,11 @@ char * replace_all(char * target, char * replace_with, char * text)
 			fprintf(stderr, "[INFO] replace_all: seems like there is no more %s, at least i hope so.\n[INFO] replace_all: replaced %i times.\n", target, i);
 			return last_iteration;
 		}
-		free(last_iteration);
+
+		if(last_iteration != text) //No liberar el string original que nos pasaron ya que no sabemos cómo se creó.
+		{
+			free(last_iteration);
+		}
 		last_iteration = result;
 		i++;
 	}

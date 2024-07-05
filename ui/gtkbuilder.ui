@@ -153,6 +153,34 @@
 						</child>
 					</object>
 				</child>
+				<child>
+					<object id="pageError" class="GtkBox">
+						<property name="visible">True</property>
+						<property name="orientation">vertical</property>
+						<property name="valign">center</property>
+						<property name="halign">center</property>
+						<property name="spacing">20</property>
+						<child>
+							<object class="GtkLabel">
+								<property name="label"><![CDATA[<span font_weight="bold" font_size="30000">Algo salió mal</span>]]></property>
+								<property name="use-markup">True</property>
+								<property name="visible">True</property>
+							</object>
+						</child>
+						<child>
+							<object id="errorLabel" class="GtkLabel">
+								<property name="label">Everything exploded or something.</property>
+								<property name="visible">True</property>
+							</object>
+						</child>
+						<child>
+							<object id="errorButton" class="GtkButton">
+								<property name="label">Salir</property>
+								<property name="visible">True</property>
+							</object>
+						</child>
+					</object>
+				</child>
 				<property name="visible-child-name">page1</property>
 			</object>
 		</child>

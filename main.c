@@ -30,6 +30,36 @@ typedef struct
 DataToParseMal * global_data_to_parse_mal = NULL;
 int index_anime = -1;
 
+void clean()
+{
+	fprintf(stderr, "[INFO] Cleaning up.\n");
+
+	if(global_data_to_parse_mal != NULL)
+	{
+		if(global_data_to_parse_mal->anime_arrays != NULL)
+		{
+			strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_names);
+			strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_names_eng);
+			strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_images_paths);
+			strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_urls);
+			free(global_data_to_parse_mal->anime_arrays);
+		}
+	}
+
+	curl_global_cleanup();
+}
+
+int show_error_page(GtkBuilder * builder, char * error)
+{
+	GObject * stack = gtk_builder_get_object(builder, "stack");
+	GObject * page_error = gtk_builder_get_object(builder, "pageError");
+	GObject * label_error = gtk_builder_get_object(builder, "errorLabel");
+	
+	gtk_label_set_text(GTK_LABEL(label_error), error);
+	
+	gtk_stack_set_visible_child(GTK_STACK(stack), GTK_WIDGET(page_error));
+}
+
 int open_anime_in_browser()
 {
 	if(global_data_to_parse_mal == NULL)
@@ -89,11 +119,14 @@ int show_random_anime()
 
 	fprintf(stderr, "[INFO] show_random_anime: %i\n", i);
 
-	char * jp_name = strarr_get(data_to_parse_mal->anime_arrays->arr_anime_names, i);
-	char * en_name = strarr_get(data_to_parse_mal->anime_arrays->arr_anime_names_eng, i);
+	char * jp_name_bad = strarr_get(data_to_parse_mal->anime_arrays->arr_anime_names, i);
+	char * en_name_bad = strarr_get(data_to_parse_mal->anime_arrays->arr_anime_names_eng, i);
 
-	if(jp_name == NULL) jp_name = "Failed to get an anime :c";
-	if(en_name == NULL) en_name = jp_name;
+	if(jp_name_bad == NULL) jp_name_bad = "Failed to get an anime :c";
+	if(en_name_bad == NULL) en_name_bad = jp_name_bad;
+
+	char * jp_name = replace_all("&#039;", "'", jp_name_bad);
+	char * en_name = replace_all("&#039;", "'", en_name_bad);
 
 	const char * markup_format_jp = "<span font_weight=\"bold\" font_size=\"16000\">%s</span>";
 	char * markup_jp = g_markup_printf_escaped(markup_format_jp, jp_name);
@@ -104,6 +137,9 @@ int show_random_anime()
 	char * markup_en = g_markup_printf_escaped(markup_format_en, en_name);
 	gtk_label_set_markup(GTK_LABEL(label_en), markup_en);
 	g_free(markup_en);
+
+	free(jp_name);
+	free(en_name);
 
 	index_anime = i;
 
@@ -132,6 +168,7 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 	if(curl_global_init(CURL_GLOBAL_DEFAULT) != 0)
 	{
 		fprintf(stderr, "[ERROR] main: failed to initialize curl globally.\n");
+		show_error_page(GTK_BUILDER(data_to_parse_mal->builder), "No se pudo iniciar libcurl");
 		return NULL;
 	}
 
@@ -147,6 +184,7 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 	if(mal_page == NULL)
 	{
 		fprintf(stderr, "[ERROR] mal_page is NULL, maybe the download failed.\n");
+		show_error_page(GTK_BUILDER(data_to_parse_mal->builder), "¿La descarga falló?");
 		return NULL;
 	}
 
@@ -157,6 +195,7 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 	if(mal_data_items_start == -1 || mal_data_items_end == -1)
 	{
 		fprintf(stderr, "[ERROR] main: Failed to find start or end of data items.\n");
+		show_error_page(GTK_BUILDER(data_to_parse_mal->builder), "No se pudo procesar la lista de animes.\nEs posible que el nombre de usuario no sea correcto.");
 		return NULL;
 	}
 
@@ -164,6 +203,7 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 	if(mal_data_items == NULL)
 	{
 		fprintf(stderr, "[ERROR] main: Failed to slice data items.\n");
+		show_error_page(GTK_BUILDER(data_to_parse_mal->builder), "Failed to slice data items.");
 		return NULL;
 	}
 
@@ -171,6 +211,7 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 	if(mal_data_items == NULL)
 	{
 		fprintf(stderr, "[ERROR] main: Failed to replace &quot;\n");
+		show_error_page(GTK_BUILDER(data_to_parse_mal->builder), "Failed to replace &quot;.");
 		return NULL;
 	}
 
@@ -179,6 +220,7 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 	if(mal_json == NULL)
 	{
 		fprintf(stderr, "[ERROR] main: Failed to parse json.\n");
+		show_error_page(GTK_BUILDER(data_to_parse_mal->builder), "No se pudo procesar json.");
 		return NULL;
 	}
 	fprintf(stderr, "[INFO] json parsed.\n");
@@ -258,24 +300,6 @@ void click_go_button(GtkWidget * widget, void * callback_arg)
 	pthread_create(&thread_id, NULL, download_and_parse_mal, (void *)data_to_parse_mal);
 }
 
-void clean()
-{
-	if(global_data_to_parse_mal == NULL) return;
-	
-	fprintf(stderr, "[INFO] Cleaning up.\n");
-
-	if(global_data_to_parse_mal->anime_arrays != NULL)
-	{
-		strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_names);
-		strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_names_eng);
-		strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_images_paths);
-		strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_urls);
-		free(global_data_to_parse_mal->anime_arrays);
-	}
-
-	curl_global_cleanup();
-}
-
 int main(int argc, char ** argv)
 {
 	generate_seed();
@@ -303,6 +327,9 @@ int main(int argc, char ** argv)
 
 	GObject * browser_button = gtk_builder_get_object(GTK_BUILDER(builder), "linkButton");
 	g_signal_connect(browser_button, "clicked", G_CALLBACK(open_anime_in_browser), NULL);
+
+	GObject * error_button = gtk_builder_get_object(GTK_BUILDER(builder), "errorButton");
+	g_signal_connect(error_button, "clicked", G_CALLBACK(gtk_main_quit), NULL);
 
 	gtk_main();
 
