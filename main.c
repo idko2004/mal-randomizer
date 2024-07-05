@@ -188,6 +188,10 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 	data_to_parse_mal->anime_arrays = anime_arrays;
 
 	change_page_and_show_result(data_to_parse_mal);
+
+	free(mal_data_items);
+	cJSON_Delete(mal_json);
+	free_CurlResponse(mal_page);
 /*
 	strarr_destroy_everything(anime_arrays->arr_anime_names);
 	strarr_destroy_everything(anime_arrays->arr_anime_names_eng);
@@ -254,6 +258,24 @@ void click_go_button(GtkWidget * widget, void * callback_arg)
 	pthread_create(&thread_id, NULL, download_and_parse_mal, (void *)data_to_parse_mal);
 }
 
+void clean()
+{
+	if(global_data_to_parse_mal == NULL) return;
+	
+	fprintf(stderr, "[INFO] Cleaning up.\n");
+
+	if(global_data_to_parse_mal->anime_arrays != NULL)
+	{
+		strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_names);
+		strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_names_eng);
+		strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_images_paths);
+		strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_urls);
+		free(global_data_to_parse_mal->anime_arrays);
+	}
+
+	curl_global_cleanup();
+}
+
 int main(int argc, char ** argv)
 {
 	generate_seed();
@@ -283,6 +305,8 @@ int main(int argc, char ** argv)
 	g_signal_connect(browser_button, "clicked", G_CALLBACK(open_anime_in_browser), NULL);
 
 	gtk_main();
+
+	clean();
 
 	return 0;
 }
