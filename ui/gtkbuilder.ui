@@ -4,34 +4,78 @@
 		<property name="visible">True</property>
 		<property name="title">MAL-randomizer</property>
 		<child>
-			<object id="box" class="GtkBox">
-				<property name="valign">center</property>
-				<property name="halign">center</property>
-				<property name="spacing">20</property>
-				<property name="orientation">vertical</property>
+			<object id="stack" class="GtkStack">
 				<property name="visible">True</property>
 				<child>
-					<object id="bigtitle" class="GtkLabel">
-						<property name="visible">True</property>
-						<property name="use-markup">True</property>
-						<property name="label"><![CDATA[<span font_weight="bold" font_size="20000">MAL-randomizer</span>]]></property>
-					</object>
-				</child>
-				<child>
-					<object id="innerbox1" class="GtkBox">
-						<property name="visible">True</property>
+					<object id="page1" class="GtkBox">
+						<property name="valign">center</property>
+						<property name="halign">center</property>
+						<property name="spacing">20</property>
 						<property name="orientation">vertical</property>
-						<property name="spacing">5</property>
+						<property name="visible">True</property>
 						<child>
-							<object id="username-label" class="GtkLabel">
-								<property name="label">Nombre de usuario</property>
+							<object id="bigtitle" class="GtkLabel">
 								<property name="visible">True</property>
+								<property name="use-markup">True</property>
+								<property name="label"><![CDATA[<span font_weight="bold" font_size="20000">MAL-randomizer</span>]]></property>
 							</object>
 						</child>
 						<child>
-							<object id="username-entry" class="GtkEntry">
-								<property name="placeholder_text">Usuario de MyAnimeList.net</property>
+							<object id="innerbox1" class="GtkBox">
 								<property name="visible">True</property>
+								<property name="orientation">vertical</property>
+								<property name="spacing">5</property>
+								<child>
+									<object id="username-label" class="GtkLabel">
+										<property name="label">Nombre de usuario</property>
+										<property name="visible">True</property>
+									</object>
+								</child>
+								<child>
+									<object id="username-entry" class="GtkEntry">
+										<property name="placeholder_text">Usuario de MyAnimeList.net</property>
+										<property name="visible">True</property>
+									</object>
+									<packing>
+										<property name="expand">True</property>
+									</packing>
+								</child>
+							</object>
+						</child>
+						<child>
+							<object id="innerbox2" class="GtkBox">
+								<property name="visible">True</property>
+								<property name="orientation">vertical</property>
+								<property name="spacing">5</property>
+								<child>
+									<object id="combobox-label" class="GtkLabel">
+										<property name="label">Lista</property>
+										<property name="visible">True</property>
+									</object>
+								</child>
+								<child>
+									<object class="GtkComboBoxText" id="anime_list_type">
+										<property name="visible">True</property>
+										<property name="active">0</property>
+										<items>
+											<item id="anime_list_type_option_all">All anime</item>
+											<item id="anime_list_type_option_currently_watching">Currently watching</item>
+											<item id="anime_list_type_option_completed">Completed</item>
+											<item id="anime_list_type_option_on_hold">On hold</item>
+											<item id="anime_list_type_option_dropped">Dropped</item>
+											<item id="anime_list_type_option_plan_to_watch">Plan to watch</item>
+										</items>
+									</object>
+									<packing>
+										<property name="expand">True</property>
+									</packing>
+								</child>
+							</object>
+						</child>
+						<child>
+							<object id="goButton" class="GtkButton">
+								<property name="visible">True</property>
+								<property name="label">Search</property>
 							</object>
 							<packing>
 								<property name="expand">True</property>
@@ -40,44 +84,40 @@
 					</object>
 				</child>
 				<child>
-					<object id="innerbox2" class="GtkBox">
-						<property name="visible">True</property>
+					<object id="page2" class="GtkBox">
 						<property name="orientation">vertical</property>
-						<property name="spacing">5</property>
+						<property name="valign">center</property>
+						<property name="halign">center</property>
+						<property name="visible">True</property>
 						<child>
-							<object id="combobox-label" class="GtkLabel">
-								<property name="label">Lista</property>
+							<object id="loadingPageSpinner" class="GtkSpinner">
 								<property name="visible">True</property>
 							</object>
 						</child>
 						<child>
-							<object class="GtkComboBoxText" id="anime_list_type">
+							<object id="loadingPageLabel" class="GtkLabel">
+								<property name="label"><![CDATA[<span font_weight="bold">Buscando el mejor anime...</span>]]></property>
+								<property name="use-markup">True</property>
 								<property name="visible">True</property>
-								<property name="active">0</property>
-								<items>
-									<item id="anime_list_type_option_all">All anime</item>
-									<item id="anime_list_type_option_currently_watching">Currently watching</item>
-									<item id="anime_list_type_option_completed">Completed</item>
-									<item id="anime_list_type_option_on_hold">On hold</item>
-									<item id="anime_list_type_option_dropped">Dropped</item>
-									<item id="anime_list_type_option_plan_to_watch">Plan to watch</item>
-								</items>
 							</object>
-							<packing>
-								<property name="expand">True</property>
-							</packing>
 						</child>
 					</object>
 				</child>
 				<child>
-					<object id="goButton" class="GtkButton">
+					<object id="page3" class="GtkBox">
 						<property name="visible">True</property>
-						<property name="label">Search</property>
+						<property name="orientation">vertical</property>
+						<property name="valign">center</property>
+						<property name="halign">center</property>
+						<child>
+							<object class="GtkLabel">
+								<property name="label">Aquí se ven los animes</property>
+								<property name="visible">True</property>
+							</object>
+						</child>
 					</object>
-					<packing>
-						<property name="expand">True</property>
-					</packing>
 				</child>
+				<property name="visible-child-name">page1</property>
 			</object>
 		</child>
 	</object>
