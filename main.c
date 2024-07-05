@@ -8,6 +8,7 @@
 
 #include "cJSON/cJSON.h"
 
+#include "gdk/gdk.h"
 #include "glib.h"
 #include "strarr.h"
 #include "ui/gtk_builder_ui.h"
@@ -28,6 +29,48 @@ typedef struct
 
 DataToParseMal * global_data_to_parse_mal = NULL;
 int index_anime = -1;
+
+int open_anime_in_browser()
+{
+	if(global_data_to_parse_mal == NULL)
+	{
+		fprintf(stderr, "[ERROR] global_data_to_parse_mal: global_data_to_parse_mal is null.\n");
+		return 1;
+	}
+
+	if(index_anime == -1)
+	{
+		fprintf(stderr, "[ERROR] global_data_to_parse_mal: anime index isn't set yet.\n");
+		return 1;
+	}
+
+	char * url_base = "https://myanimelist.net%s";
+	char * anime_url = strarr_get(global_data_to_parse_mal->anime_arrays->arr_anime_urls, index_anime);
+	if(anime_url == NULL)
+	{
+		fprintf(stderr, "[ERROR] global_data_to_parse_mal: Failed to get anime_id.\n");
+		return 1;
+	}
+
+	char * url = malloc(sizeof(char) * (strlen(url_base) + strlen(anime_url) + 1));
+	sprintf(url, url_base, anime_url);
+
+	GObject * window = gtk_builder_get_object(global_data_to_parse_mal->builder, "window");
+
+	GError * error = NULL;
+
+	gtk_show_uri_on_window(GTK_WINDOW(window), url, GDK_CURRENT_TIME, &error);
+
+	if(error != NULL)
+	{
+		fprintf(stderr, "[ERROR] global_data_to_parse_mal: gtk_show_uri_on_window: %s.\n", error->message);
+		return 1;
+	}
+
+	free(url);
+
+	return 0;
+}
 
 int show_random_anime()
 {
@@ -94,7 +137,7 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 
 	char * url_base = "https://myanimelist.net/animelist/%s?status=%i";
 
-	char * url = malloc(sizeof(char) * strlen(url_base) + strlen(username));
+	char * url = malloc(sizeof(char) * (strlen(url_base) + strlen(username)));
 	sprintf(url, url_base, username, status);
 
 	fprintf(stderr, "[INFO] url = %s", url);
@@ -235,6 +278,9 @@ int main(int argc, char ** argv)
 
 	GObject * reroll_button = gtk_builder_get_object(GTK_BUILDER(builder), "rerollButton");
 	g_signal_connect(reroll_button, "clicked", G_CALLBACK(show_random_anime), NULL);
+
+	GObject * browser_button = gtk_builder_get_object(GTK_BUILDER(builder), "linkButton");
+	g_signal_connect(browser_button, "clicked", G_CALLBACK(open_anime_in_browser), NULL);
 
 	gtk_main();
 
