@@ -56,7 +56,7 @@
 								<child>
 									<object class="GtkComboBoxText" id="anime_list_type">
 										<property name="visible">True</property>
-										<property name="active">0</property>
+										<property name="active">5</property>
 										<items>
 											<item id="anime_list_type_option_all">All anime</item>
 											<item id="anime_list_type_option_currently_watching">Currently watching</item>
@@ -88,6 +88,7 @@
 						<property name="orientation">vertical</property>
 						<property name="valign">center</property>
 						<property name="halign">center</property>
+						<property name="spacing">5</property>
 						<property name="visible">True</property>
 						<child>
 							<object id="loadingPageSpinner" class="GtkSpinner">
@@ -109,10 +110,45 @@
 						<property name="orientation">vertical</property>
 						<property name="valign">center</property>
 						<property name="halign">center</property>
+						<property name="spacing">20</property>
 						<child>
-							<object class="GtkLabel">
-								<property name="label">Aquí se ven los animes</property>
+							<object class="GtkBox">
+								<property name="orientation">vertical</property>
+								<property name="spacing">5</property>
 								<property name="visible">True</property>
+								<child>
+									<object id="anime_name_jp" class="GtkLabel">
+										<property name="label">Japanese name</property>
+										<property name="use-markup">True</property>
+										<property name="visible">True</property>
+									</object>
+								</child>
+								<child>
+									<object id="anime_name_en" class="GtkLabel">
+										<property name="label">English name</property>
+										<property name="use-markup">True</property>
+										<property name="visible">True</property>
+									</object>
+								</child>
+							</object>
+						</child>
+						<child>
+							<object class="GtkBox">
+								<property name="orientation">vertical</property>
+								<property name="spacing">5</property>
+								<property name="visible">True</property>
+								<child>
+									<object id="rerollButton" class="GtkButton">
+										<property name="visible">True</property>
+										<property name="label">Reroll</property>
+									</object>
+								</child>
+								<child>
+									<object id="linkButton" class="GtkButton">
+										<property name="visible">True</property>
+										<property name="label">Ver en MyAnimeList.net</property>
+									</object>
+								</child>
 							</object>
 						</child>
 					</object>

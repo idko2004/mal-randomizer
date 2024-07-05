@@ -28,8 +28,14 @@ gcc -c text_parser.c -o "${MATERIALS}/text_parser.o"
 echo -e "${YELLOW}Compiling process_anime${NOCOLOR}"
 gcc -c process_anime.c -o "${MATERIALS}/process_anime.o"
 
+echo -e "${YELLOW}Compiling seed${NOCOLOR}"
+gcc -c seed.c -o "${MATERIALS}/seed.o"
+
+echo -e "${YELLOW}Compiling random${NOCOLOR}"
+gcc -c random.c -o "${MATERIALS}/random.o"
+
 echo -e "${YELLOW}Compiling main${NOCOLOR}"
-gcc -lcurl `pkg-config --cflags --libs gtk+-3.0` "${MATERIALS}/cJSON.o" "${MATERIALS}/strarr.o" "${MATERIALS}/curl_wrapper.o" "${MATERIALS}/text_parser.o" "${MATERIALS}/process_anime.o" main.c -o "${BUILD}/mal-randomizer"
+gcc -lcurl `pkg-config --cflags --libs gtk+-3.0` "${MATERIALS}/cJSON.o" "${MATERIALS}/strarr.o" "${MATERIALS}/curl_wrapper.o" "${MATERIALS}/text_parser.o" "${MATERIALS}/process_anime.o" "${MATERIALS}/seed.o" "${MATERIALS}/random.o" main.c -o "${BUILD}/mal-randomizer"
 
 if [ $? -eq 0 ]; then
 	echo -e "${GREEN}Done!${NOCOLOR}"

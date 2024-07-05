@@ -41,7 +41,10 @@ AnimeArrays * process_anime(cJSON * mal_data_items_json) //Guarda los animes del
 		}
 
 		push_result = strarr_push(arr_anime_names, anime_title->valuestring);
-		push_result += strarr_push(arr_anime_names_eng, anime_title_eng->valuestring);
+
+		if(strcmp(anime_title_eng->valuestring, "") == 0) push_result += strarr_push(arr_anime_names_eng, anime_title->valuestring); //Guardar el nombre en japonés si no hay nombre en inglés.
+		else push_result += strarr_push(arr_anime_names_eng, anime_title_eng->valuestring);
+
 		push_result += strarr_push(arr_anime_urls, anime_url->valuestring);
 		push_result += strarr_push(arr_anime_images_paths, anime_image_path->valuestring);
 		if(push_result > 0)

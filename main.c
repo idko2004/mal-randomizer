@@ -8,11 +8,14 @@
 
 #include "cJSON/cJSON.h"
 
+#include "glib.h"
+#include "strarr.h"
 #include "ui/gtk_builder_ui.h"
 #include "curl_wrapper.h"
 #include "text_parser.h"
 #include "process_anime.h"
-#include "strarr.h"
+#include "seed.h"
+#include "random.h"
 
 typedef struct
 {
@@ -23,13 +26,58 @@ typedef struct
 	AnimeArrays * anime_arrays; //out
 } DataToParseMal;
 
+DataToParseMal * global_data_to_parse_mal = NULL;
+int index_anime = -1;
+
+int show_random_anime()
+{
+	DataToParseMal * data_to_parse_mal = global_data_to_parse_mal;
+
+	if(data_to_parse_mal == NULL)
+	{
+		fprintf(stderr, "[ERROR] show_random_anime: global_data_to_parse_mal is null.\n");
+		return 1;
+	}
+
+	GObject * label_jp = gtk_builder_get_object(GTK_BUILDER(data_to_parse_mal->builder), "anime_name_jp");
+	GObject * label_en = gtk_builder_get_object(GTK_BUILDER(data_to_parse_mal->builder), "anime_name_en");
+
+	int i = get_index_of_random_anime(data_to_parse_mal->anime_arrays);
+
+	fprintf(stderr, "[INFO] show_random_anime: %i\n", i);
+
+	char * jp_name = strarr_get(data_to_parse_mal->anime_arrays->arr_anime_names, i);
+	char * en_name = strarr_get(data_to_parse_mal->anime_arrays->arr_anime_names_eng, i);
+
+	if(jp_name == NULL) jp_name = "Failed to get an anime :c";
+	if(en_name == NULL) en_name = jp_name;
+
+	const char * markup_format_jp = "<span font_weight=\"bold\" font_size=\"16000\">%s</span>";
+	char * markup_jp = g_markup_printf_escaped(markup_format_jp, jp_name);
+	gtk_label_set_markup(GTK_LABEL(label_jp), markup_jp);
+	g_free(markup_jp);
+
+	const char * markup_format_en = "<span font_size=\"12000\">%s</span>";
+	char * markup_en = g_markup_printf_escaped(markup_format_en, en_name);
+	gtk_label_set_markup(GTK_LABEL(label_en), markup_en);
+	g_free(markup_en);
+
+	index_anime = i;
+
+	return 0;
+}
+
 int change_page_and_show_result(DataToParseMal * data_to_parse_mal)
 {
+	global_data_to_parse_mal = data_to_parse_mal;
+
 	GObject * stack = gtk_builder_get_object(GTK_BUILDER(data_to_parse_mal->builder), "stack");
 	GObject * page3 = gtk_builder_get_object(GTK_BUILDER(data_to_parse_mal->builder), "page3");
 	gtk_stack_set_visible_child(GTK_STACK(stack), GTK_WIDGET(page3));
 	GObject * spinner = gtk_builder_get_object(GTK_BUILDER(data_to_parse_mal->builder), "loadingPageSpinner");
 	gtk_spinner_stop(GTK_SPINNER(spinner));
+
+	show_random_anime();
 }
 
 void * download_and_parse_mal(void * data_to_parse_mal_ptr)
@@ -161,12 +209,12 @@ void click_go_button(GtkWidget * widget, void * callback_arg)
 	data_to_parse_mal->anime_arrays = NULL;
 
 	pthread_create(&thread_id, NULL, download_and_parse_mal, (void *)data_to_parse_mal);
-	
-	//startDoingTheStuff(username, list_selected, GTK_BUILDER(callback_arg));
 }
 
 int main(int argc, char ** argv)
 {
+	generate_seed();
+
 	GtkBuilder * builder;
 	GError * error = NULL;
 
@@ -184,6 +232,9 @@ int main(int argc, char ** argv)
 
 	GObject * button = gtk_builder_get_object(builder, "goButton");
 	g_signal_connect(button, "clicked", G_CALLBACK(click_go_button), builder);
+
+	GObject * reroll_button = gtk_builder_get_object(GTK_BUILDER(builder), "rerollButton");
+	g_signal_connect(reroll_button, "clicked", G_CALLBACK(show_random_anime), NULL);
 
 	gtk_main();
 
