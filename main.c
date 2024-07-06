@@ -5,6 +5,7 @@
 #include <curl/curl.h>
 #include <gtk/gtk.h>
 #include <time.h>
+#include <locale.h>
 
 #include "cJSON/cJSON.h"
 
@@ -221,20 +222,25 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 		return NULL;
 	}
 
-	mal_data_items = replace_all("&quot;", "\"", mal_data_items);
-	if(mal_data_items == NULL)
+	char * mal_data_items_parsed = replace_all("&quot;", "\"", mal_data_items);
+	if(mal_data_items_parsed == NULL)
 	{
 		fprintf(stderr, "[ERROR] main: Failed to replace &quot;\n");
 		show_error_page(GTK_BUILDER(data_to_parse_mal->builder), "Failed to replace &quot;.");
 		return NULL;
 	}
+	
+	long int mal_data_items_parsed_length = strlen(mal_data_items_parsed) + 1;
+	fprintf(stderr, "[INFO] length of mal_data_items_parsed is %li\n", mal_data_items_parsed_length);
 
 	fprintf(stderr, "[INFO] starting to parse json.\n");
-	cJSON * mal_json = cJSON_Parse(mal_data_items);
+	setlocale( LC_NUMERIC, "C");
+	cJSON * mal_json = cJSON_ParseWithLength(mal_data_items_parsed, mal_data_items_parsed_length);
 	if(mal_json == NULL)
 	{
 		fprintf(stderr, "[ERROR] main: Failed to parse json.\n");
 		show_error_page(GTK_BUILDER(data_to_parse_mal->builder), "No se pudo procesar json.");
+		fprintf(stderr, "[ERROR] cJSON_GetErrorPtr: %s\n", cJSON_GetErrorPtr());
 		return NULL;
 	}
 	fprintf(stderr, "[INFO] json parsed.\n");
@@ -245,7 +251,9 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 
 	change_page_and_show_result(data_to_parse_mal);
 
+	free(url);
 	free(mal_data_items);
+	free(mal_data_items_parsed);
 	cJSON_Delete(mal_json);
 	free_CurlResponse(mal_page);
 /*

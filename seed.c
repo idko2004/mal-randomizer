@@ -9,6 +9,8 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
+
+
 #define PRINT_DEBUG 0
 
 char * seedfile_path = NULL; //archivo que guarda la seed

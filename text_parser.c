@@ -60,7 +60,7 @@ char * slice_text(long int from, long int to, char * input)
 	return result;
 }
 
-char * replace_text(char * target, char * replace_with, char * text, int * start_looking_at)
+char * replace_text(char * target, char * replace_with, char * text, long int * start_looking_at)
 {
 	long int target_start = find_in_text(target, text, *start_looking_at);
 	//fprintf(stderr, "[INFO] replace_text: start of target is in %li\n", target_start);
@@ -72,7 +72,7 @@ char * replace_text(char * target, char * replace_with, char * text, int * start
 	long int target_end = target_start + strlen(target);
 	//fprintf(stderr, "[INFO] replace_text: end of target should be in %li\n", target_end);
 
-	char * new_text = malloc(sizeof(char) * strlen(text));
+	char * new_text = malloc(sizeof(char) * (strlen(text) + 1));
 	if(new_text == NULL)
 	{
 		fprintf(stderr, "[ERROR] replace_text: Couldn't allocate memory for new text.\n");
@@ -90,7 +90,7 @@ char * replace_text(char * target, char * replace_with, char * text, int * start
 	//fprintf(stderr, "[INFO] replace_text: after text currently is: '%s'\n", after_text);
 
 	strcpy(new_text, before_text);
-	int length = target_start;
+	long int length = target_start;
 	//fprintf(stderr, "[INFO] replace_text: before text copied, length is %i\n", length);
 	strcpy(new_text + length, replace_with);
 	length += strlen(replace_with);
@@ -112,15 +112,17 @@ char * replace_text(char * target, char * replace_with, char * text, int * start
 char * replace_all(char * target, char * replace_with, char * text)
 {
 	fprintf(stderr, "[INFO] replace_all: starting to replace %s\n", target);
+	//printf("[INFO] replace_all: how it enters:\n%s\n", text);
 	char * last_iteration = text;
-	int last_position_found = 0;
-	int i = 0;
+	long int last_position_found = 0;
+	long int i = 0;
 	while(1)
 	{
 		char * result = replace_text(target, replace_with, last_iteration, &last_position_found);
 		if(result == NULL)
 		{
-			fprintf(stderr, "[INFO] replace_all: seems like there is no more %s, at least i hope so.\n[INFO] replace_all: replaced %i times.\n", target, i);
+			fprintf(stderr, "[INFO] replace_all: seems like there is no more %s, at least i hope so.\n[INFO] replace_all: replaced %li times.\n", target, i);
+			//printf("[INFO] replace_all: how it exits:\n%s\n", last_iteration);
 			return last_iteration;
 		}
 

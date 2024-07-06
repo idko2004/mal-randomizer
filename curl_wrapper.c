@@ -81,11 +81,22 @@ CurlResponse * curlw_get_as_text(char * url)
 		fprintf(stderr, "[ERROR] curl_get_as_text: Failed to set option to curl: CURLOPT_WRITEDATA.\n");
 		return NULL;
 	}
+	
+	#ifdef _WIN32
+		//Abrir certificado CA de myanimelist.net sino no se puede establecer una conexión HTTPS en windows por algún motivo
+		fprintf(stderr, "[INFO] curl_get_as_text: Setting CURLOPT_CAINFO.\n");
+
+		if(curl_easy_setopt(curl, CURLOPT_CAINFO, "myanimelist-net.pem") != CURLE_OK)
+		{
+			fprintf(stderr, "[ERROR] curl_get_as_text: Failed to set option to curl: CURLOPT_CAINFO.\n");
+			return NULL;
+		}
+	#endif
 
 	curl_result = curl_easy_perform(curl);
 	if(curl_result != CURLE_OK)
 	{
-		fprintf(stderr, "[ERROR] curl_get_as_text: Failed to easy perform on curl.\n");
+		fprintf(stderr, "[ERROR] curl_get_as_text: Failed to easy perform on curl with code %i.\n", curl_result);
 		return NULL;
 	}
 
