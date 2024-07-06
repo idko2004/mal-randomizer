@@ -1,5 +1,7 @@
 #include "seed.h"
 
+#ifndef _WIN32
+
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -209,3 +211,18 @@ void generate_seed()
 
 	srand(seed);
 }
+#endif
+
+//Versión para windows
+#ifdef _WIN32
+
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+void generate_seed()
+{
+	srand(time(NULL));
+}
+
+#endif
