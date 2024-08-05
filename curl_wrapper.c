@@ -5,11 +5,16 @@
 #include <string.h>
 #include <curl/curl.h>
 
-CurlResponse * new_CurlResponse()
+CurlResponse * new_CurlResponse(int response_is_text)
 {
 	CurlResponse * response = malloc(sizeof(CurlResponse));
 	response->content = malloc(1);
 	response->size = 0;
+	if(response_is_text == 1)
+	{
+		response->is_text = 1;
+		response->content_as_text = (char *) response->content;
+	}
 	return response;
 }
 
@@ -36,7 +41,11 @@ size_t write_curl_response_callback(void * buffer, size_t size, size_t nmemb, vo
 	memcpy(&(response->content[response->size]), buffer, realsize);
 
 	response->size += realsize;
-	response->content[response->size] = '\0';
+
+	if(response->is_text)
+	{
+		response->content_as_text[response->size] = '\0';
+	}
 
 	return realsize;
 }
@@ -47,7 +56,7 @@ CurlResponse * curlw_get_as_text(char * url)
 	CURL * curl;
 	CURLcode curl_result;
 	
-	CurlResponse * curl_response = new_CurlResponse();
+	CurlResponse * curl_response = new_CurlResponse(1);
 
 	/*if(curl_global_init(CURL_GLOBAL_DEFAULT) != 0)
 	{

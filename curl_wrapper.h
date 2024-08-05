@@ -5,11 +5,13 @@
 
 typedef struct
 {
-	char * content;
+	void * content;
+	char * content_as_text; //Igual que content pero casteado para no tener que castear cada vez que se quiere usar, solo es válido si is_text es 1
+	int is_text; //1 si es texto, -1 si es un stream
 	size_t size;
 } CurlResponse;
 
-CurlResponse * new_CurlResponse(); // Initialize a CurlResponse struct, when you finish using it you should free_CurlResponse()
+CurlResponse * new_CurlResponse(int response_is_text); // Initialize a CurlResponse struct, when you finish using it you should free_CurlResponse()
 
 void free_CurlResponse(CurlResponse * curl_response); //Frees the CurlResponse
 

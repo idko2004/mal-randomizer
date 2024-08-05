@@ -156,6 +156,8 @@ int show_random_anime()
 
 	index_anime = i;
 
+	strarr_print_all(data_to_parse_mal->anime_arrays->arr_anime_images_paths);
+
 	return 0;
 }
 
