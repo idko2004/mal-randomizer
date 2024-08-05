@@ -9,8 +9,6 @@
 
 #include "cJSON/cJSON.h"
 
-#include "gdk/gdk.h"
-#include "glib.h"
 #include "strarr.h"
 #include "ui/gtk_builder_ui.h"
 #include "curl_wrapper.h"
@@ -150,12 +148,12 @@ int show_random_anime()
 	gtk_label_set_markup(GTK_LABEL(label_en), markup_en);
 	g_free(markup_en);
 
-/*
+
 	free(jp_name);
 	free(en_name);
 	free(jp_name_copy);
 	free(en_name_copy);
-*/
+
 	index_anime = i;
 
 	return 0;

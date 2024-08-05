@@ -26,6 +26,7 @@ long int find_in_text(char * s, char * input, long int start_at)
 					return i;
 				}
 			}
+			else break;
 		}
 		matches = 0;
 	}
