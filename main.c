@@ -37,10 +37,14 @@ void clean()
 	{
 		if(global_data_to_parse_mal->anime_arrays != NULL)
 		{
-			strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_names);
-			strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_names_eng);
-			strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_images_paths);
-			strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_urls);
+			if(global_data_to_parse_mal->anime_arrays->arr_anime_names != NULL) strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_names);
+
+			if(global_data_to_parse_mal->anime_arrays->arr_anime_names_eng != NULL) strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_names_eng);
+
+			if(global_data_to_parse_mal->anime_arrays->arr_anime_images_paths != NULL) strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_images_paths);
+
+			if(global_data_to_parse_mal->anime_arrays->arr_anime_urls != NULL) strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_urls);
+
 			free(global_data_to_parse_mal->anime_arrays);
 		}
 	}
