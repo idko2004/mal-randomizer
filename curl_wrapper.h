@@ -20,5 +20,7 @@ int curlw_easy_download(char * url, CurlResponse * curl_response);
 
 CurlResponse * curlw_get_as_text(char * url); //Downloads the specified url from the internet and interprets it as text. Creates a new CurlResponse and returns the contents in it.
 
+CurlResponse * curlw_get(char * url); //Downlaods the specified url from the internet. Creates a new CurlResponse and returns the contents in it.
+
 
 #endif

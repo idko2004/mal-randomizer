@@ -138,3 +138,21 @@ CurlResponse * curlw_get_as_text(char * url)
 
 	return curl_response;
 }
+
+CurlResponse * curlw_get(char * url)
+{
+	CurlResponse * curl_response = new_CurlResponse(0);
+	if(curl_response == NULL)
+	{
+		fprintf(stderr, "[ERROR] curlw_get: Failed to create new CurlResponse.\n");
+		return NULL;
+	}
+
+	if(curlw_easy_download(url, curl_response) != 0)
+	{
+		fprintf(stderr, "[ERROR] curlw_get: curlw_easy_download failed.\n");
+		return NULL;
+	}
+
+	return curl_response;
+}

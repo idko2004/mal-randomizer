@@ -16,6 +16,7 @@
 #include "process_anime.h"
 #include "seed.h"
 #include "random.h"
+#include "image.h"
 
 typedef struct
 {
@@ -152,6 +153,12 @@ int show_random_anime()
 	gtk_label_set_markup(GTK_LABEL(label_en), markup_en);
 	g_free(markup_en);
 
+	char * image_url = strarr_get(data_to_parse_mal->anime_arrays->arr_anime_images_paths, i);
+	if(image_url != NULL)
+	{
+		download_and_show_image(image_url, data_to_parse_mal->builder);
+	}
+	else fprintf(stderr, "[WARN] Failed to get image url.\n");
 
 	free(jp_name);
 	free(en_name);
@@ -159,8 +166,6 @@ int show_random_anime()
 	free(en_name_copy);
 
 	index_anime = i;
-
-	strarr_print_all(data_to_parse_mal->anime_arrays->arr_anime_images_paths);
 
 	return 0;
 }
@@ -209,8 +214,8 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 
 	//printf("%s", mal_page->content);
 
-	long int mal_data_items_start = find_in_text("data-items=\"", mal_page->content, 0);
-	long int mal_data_items_end = find_in_text("\" data-broadcasts", mal_page->content, mal_data_items_start);
+	long int mal_data_items_start = find_in_text("data-items=\"", mal_page->content_as_text, 0);
+	long int mal_data_items_end = find_in_text("\" data-broadcasts", mal_page->content_as_text, mal_data_items_start);
 	if(mal_data_items_start == -1 || mal_data_items_end == -1)
 	{
 		fprintf(stderr, "[ERROR] main: Failed to find start or end of data items.\n");
@@ -218,7 +223,7 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 		return NULL;
 	}
 
-	char * mal_data_items = slice_text(mal_data_items_start + strlen("data-items=\""), mal_data_items_end, mal_page->content);
+	char * mal_data_items = slice_text(mal_data_items_start + strlen("data-items=\""), mal_data_items_end, mal_page->content_as_text);
 	if(mal_data_items == NULL)
 	{
 		fprintf(stderr, "[ERROR] main: Failed to slice data items.\n");
