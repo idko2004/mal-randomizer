@@ -5,6 +5,8 @@
 #include <string.h>
 #include <curl/curl.h>
 
+#include "text_parser.h"
+
 CurlResponse * new_CurlResponse(int response_is_text)
 {
 	CurlResponse * response = malloc(sizeof(CurlResponse));
@@ -64,6 +66,23 @@ size_t write_curl_response_callback(void * buffer, size_t size, size_t nmemb, vo
 	return realsize;
 }
 
+char * get_cert_name(char * url)
+{
+	char * main_page_cert = "myanimelist-net.pem";
+	char * cdn_cert = "cdn-myanimelist-net.pem";
+
+	if(find_in_text("cdn.myanimelist.net", url, 0) != -1)
+	{
+		fprintf(stderr, "[INFO] using cert file: cdn-myanimelist-net.pem\n");
+		return cdn_cert;
+	}
+	else
+	{
+		fprintf(stderr, "[INFO] using cert file: myanimelist-net.pem\n");
+		return main_page_cert;
+	}
+}
+
 //Esta función está hecha para ser un punto común entre curlw_get y curlw_get_as_text
 int curlw_easy_download(char * url, CurlResponse * curl_response)
 {
@@ -102,7 +121,7 @@ int curlw_easy_download(char * url, CurlResponse * curl_response)
 		//Abrir certificado CA de myanimelist.net sino no se puede establecer una conexión HTTPS en windows por algún motivo
 		fprintf(stderr, "[INFO] curl_get_as_text: Setting CURLOPT_CAINFO.\n");
 
-		if(curl_easy_setopt(curl, CURLOPT_CAINFO, "myanimelist-net.pem") != CURLE_OK)
+		if(curl_easy_setopt(curl, CURLOPT_CAINFO, get_cert_name(url)) != CURLE_OK)
 		{
 			fprintf(stderr, "[ERROR] curl_get_as_text: Failed to set option to curl: CURLOPT_CAINFO.\n");
 			return -1;

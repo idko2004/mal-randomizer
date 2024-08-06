@@ -19,6 +19,7 @@
 -I/usr/lib/dbus-1.0/include
 -I/usr/include/fribidi
 -I/usr/include/gio-unix-2.0
+-IC:\msys64\mingw64\bin\
 -lgtk-3
 -lgdk-3
 -lz
