@@ -110,57 +110,70 @@
 				</child>
 				<child>
 
-					<!--result screen-->
+					<!--result screen and spinner-->
 					<object id="page3" class="GtkBox">
 						<property name="visible">True</property>
 						<property name="orientation">vertical</property>
 						<property name="valign">center</property>
 						<property name="halign">center</property>
-						<property name="spacing">20</property>
-						<child>
-							<object class="GtkBox">
-								<property name="orientation">vertical</property>
-								<property name="spacing">5</property>
+						<child> <!--result screen-->
+							<object class="GtkBox" id="resultScreenShow">
 								<property name="visible">True</property>
+								<property name="orientation">vertical</property>
+								<property name="valign">center</property>
+								<property name="halign">center</property>
+								<property name="spacing">20</property>
 								<child>
-									<object class="GtkImage" id="animeImage">
+									<object class="GtkBox">
+										<property name="orientation">vertical</property>
+										<property name="spacing">5</property>
 										<property name="visible">True</property>
-										<property name="icon_size">4</property>
+										<child>
+											<object class="GtkImage" id="animeImage">
+												<property name="visible">True</property>
+												<property name="icon_size">4</property>
+											</object>
+										</child>
+										<child>
+											<object id="anime_name_jp" class="GtkLabel">
+												<property name="label">Japanese name</property>
+												<property name="use-markup">True</property>
+												<property name="visible">True</property>
+											</object>
+										</child>
+										<child>
+											<object id="anime_name_en" class="GtkLabel">
+												<property name="label">English name</property>
+												<property name="use-markup">True</property>
+												<property name="visible">True</property>
+											</object>
+										</child>
 									</object>
 								</child>
 								<child>
-									<object id="anime_name_jp" class="GtkLabel">
-										<property name="label">Japanese name</property>
-										<property name="use-markup">True</property>
+									<object class="GtkBox">
+										<property name="orientation">vertical</property>
+										<property name="spacing">5</property>
 										<property name="visible">True</property>
-									</object>
-								</child>
-								<child>
-									<object id="anime_name_en" class="GtkLabel">
-										<property name="label">English name</property>
-										<property name="use-markup">True</property>
-										<property name="visible">True</property>
+										<child>
+											<object id="rerollButton" class="GtkButton">
+												<property name="visible">True</property>
+												<property name="label">Reroll</property>
+											</object>
+										</child>
+										<child>
+											<object id="linkButton" class="GtkButton">
+												<property name="visible">True</property>
+												<property name="label">Ver en MyAnimeList.net</property>
+											</object>
+										</child>
 									</object>
 								</child>
 							</object>
 						</child>
 						<child>
-							<object class="GtkBox">
-								<property name="orientation">vertical</property>
-								<property name="spacing">5</property>
-								<property name="visible">True</property>
-								<child>
-									<object id="rerollButton" class="GtkButton">
-										<property name="visible">True</property>
-										<property name="label">Reroll</property>
-									</object>
-								</child>
-								<child>
-									<object id="linkButton" class="GtkButton">
-										<property name="visible">True</property>
-										<property name="label">Ver en MyAnimeList.net</property>
-									</object>
-								</child>
+							<object id="resultPageSpinner" class="GtkSpinner">
+								<property name="visible">False</property>
 							</object>
 						</child>
 					</object>

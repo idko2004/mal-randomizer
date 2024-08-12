@@ -9,6 +9,8 @@
 
 #include "cJSON/cJSON.h"
 
+#include "glib-object.h"
+#include "glib.h"
 #include "strarr.h"
 #include "ui/gtk_builder_ui.h"
 #include "curl_wrapper.h"
@@ -174,13 +176,39 @@ int change_page_and_show_result(DataToParseMal * data_to_parse_mal)
 {
 	global_data_to_parse_mal = data_to_parse_mal;
 
+	show_random_anime();
+
 	GObject * stack = gtk_builder_get_object(GTK_BUILDER(data_to_parse_mal->builder), "stack");
 	GObject * page3 = gtk_builder_get_object(GTK_BUILDER(data_to_parse_mal->builder), "page3");
 	gtk_stack_set_visible_child(GTK_STACK(stack), GTK_WIDGET(page3));
 	GObject * spinner = gtk_builder_get_object(GTK_BUILDER(data_to_parse_mal->builder), "loadingPageSpinner");
 	gtk_spinner_stop(GTK_SPINNER(spinner));
+}
 
-	show_random_anime();
+int show_result_page_spinner(GtkBuilder * builder, int show)
+{
+	GObject * spinner = gtk_builder_get_object(builder, "resultPageSpinner");
+	GObject * resultPage = gtk_builder_get_object(builder, "resultScreenShow");
+
+	if(show == 0) //0 = show
+	{
+		gtk_widget_set_visible(GTK_WIDGET(resultPage), FALSE);
+		gtk_widget_set_visible(GTK_WIDGET(spinner), TRUE);
+		gtk_spinner_start(GTK_SPINNER(spinner));
+	}
+	else if(show == -1) // 0 = hide
+	{
+		gtk_spinner_stop(GTK_SPINNER(spinner));
+		gtk_widget_set_visible(GTK_WIDGET(spinner), FALSE);
+		gtk_widget_set_visible(GTK_WIDGET(resultPage), TRUE);
+	}
+	else
+	{
+		fprintf(stderr, "[ERROR] show_result_page_spinner: invalid show value.\n");
+		return 1;
+	}
+
+	return 0;
 }
 
 void * download_and_parse_mal(void * data_to_parse_mal_ptr)
@@ -278,6 +306,12 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 */
 }
 
+void * rerollAnime(void * builder_ptr)
+{
+	show_random_anime();
+	show_result_page_spinner(GTK_BUILDER(builder_ptr), -1);
+}
+
 void click_go_button(GtkWidget * widget, void * callback_arg)
 {
 	fprintf(stderr, "[INFO] Go button was clicked.\n");
@@ -329,6 +363,22 @@ void click_go_button(GtkWidget * widget, void * callback_arg)
 	data_to_parse_mal->anime_arrays = NULL;
 
 	pthread_create(&thread_id, NULL, download_and_parse_mal, (void *)data_to_parse_mal);
+	pthread_detach(thread_id);
+}
+
+void click_reroll_button(GtkWidget * widget, void * callback_arg)
+{
+	if(global_data_to_parse_mal == NULL)
+	{
+		fprintf(stderr, "[ERROR] click_reroll_button: global_data_to_parse_mal was not defined so can't proceed.\n");
+		return;
+	}
+
+	show_result_page_spinner(global_data_to_parse_mal->builder, 0);
+
+	pthread_t thread_id;
+	pthread_create(&thread_id, NULL, rerollAnime, callback_arg);
+	pthread_detach(thread_id);
 }
 
 int main(int argc, char ** argv)
@@ -354,7 +404,7 @@ int main(int argc, char ** argv)
 	g_signal_connect(button, "clicked", G_CALLBACK(click_go_button), builder);
 
 	GObject * reroll_button = gtk_builder_get_object(GTK_BUILDER(builder), "rerollButton");
-	g_signal_connect(reroll_button, "clicked", G_CALLBACK(show_random_anime), NULL);
+	g_signal_connect(reroll_button, "clicked", G_CALLBACK(click_reroll_button), builder);
 
 	GObject * browser_button = gtk_builder_get_object(GTK_BUILDER(builder), "linkButton");
 	g_signal_connect(browser_button, "clicked", G_CALLBACK(open_anime_in_browser), NULL);
