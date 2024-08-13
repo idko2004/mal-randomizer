@@ -139,8 +139,8 @@ int show_random_anime()
 		en_name_bad = jp_name_bad;
 	}
 
-	fprintf(stderr, "[INFO] anime name jp: %s\n", jp_name_bad);
-	fprintf(stderr, "[INFO] anime name en: %s\n", en_name_bad);
+	fprintf(stderr, "[INFO] anime name jp: %s (%p)\n", jp_name_bad, jp_name_bad);
+	fprintf(stderr, "[INFO] anime name en: %s (%p)\n", en_name_bad, en_name_bad);
 
 	char * jp_name = replace_all("&#039;", "'", jp_name_bad);
 	char * en_name = replace_all("&#039;", "'", en_name_bad);
@@ -240,7 +240,7 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 
 	char * url_base = "https://myanimelist.net/animelist/%s?status=%i";
 
-	char * url = malloc(sizeof(char) * (strlen(url_base) + strlen(username)));
+	char * url = malloc(sizeof(char) * (strlen(url_base) + strlen(username) + 1));
 	sprintf(url, url_base, username, status);
 
 	fprintf(stderr, "[INFO] url = %s", url);
@@ -256,8 +256,8 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 
 	//printf("%s", mal_page->content);
 
-	long int mal_data_items_start = find_in_text("data-items=\"", mal_page->content_as_text, 0);
-	long int mal_data_items_end = find_in_text("\" data-broadcasts", mal_page->content_as_text, mal_data_items_start);
+	long int mal_data_items_start = find_in_text("data-items=\"", mal_page->content, 0);
+	long int mal_data_items_end = find_in_text("\" data-broadcasts", mal_page->content, mal_data_items_start);
 	if(mal_data_items_start == -1 || mal_data_items_end == -1)
 	{
 		fprintf(stderr, "[ERROR] main: Failed to find start or end of data items.\n");
@@ -265,7 +265,7 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 		return NULL;
 	}
 
-	char * mal_data_items = slice_text(mal_data_items_start + strlen("data-items=\""), mal_data_items_end, mal_page->content_as_text);
+	char * mal_data_items = slice_text(mal_data_items_start + strlen("data-items=\""), mal_data_items_end, mal_page->content);
 	if(mal_data_items == NULL)
 	{
 		fprintf(stderr, "[ERROR] main: Failed to slice data items.\n");

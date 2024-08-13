@@ -43,7 +43,7 @@ AnimeArrays * process_anime(cJSON * mal_data_items_json) //Guarda los animes del
 			return NULL;
 		}
 
-		printf("%i: %s | %s\n", i, anime_title->valuestring, anime_title_eng->valuestring);
+		//printf("%i: %s | %s\n", i, anime_title->valuestring, anime_title_eng->valuestring);
 
 		char * anime_name_jp_copy = malloc(sizeof(char) * strlen(anime_title->valuestring) +1);
 		if(anime_name_jp_copy == NULL)
@@ -65,7 +65,7 @@ AnimeArrays * process_anime(cJSON * mal_data_items_json) //Guarda los animes del
 			}
 			strcpy(anime_name_en_copy, anime_title->valuestring);
 			push_result += ptrarr_push(arr_anime_names_eng, anime_name_en_copy);
-			fprintf(stderr, "[INFO] process_anime: anime %s will use jp name only.\n", anime_title->valuestring);
+			fprintf(stderr, "[INFO] process_anime: anime %s will use jp name only.\n", anime_name_en_copy);
 		}
 		else
 		{
@@ -102,6 +102,13 @@ AnimeArrays * process_anime(cJSON * mal_data_items_json) //Guarda los animes del
 			fprintf(stderr, "[ERROR] process_anime: Failed to push to ptrarr %i times.\n", push_result);
 			return NULL;
 		}
+
+		printf("%i: (%p)%s | (%p)%s\n", i,
+			ptrarr_get(arr_anime_names, i),
+			(char *) ptrarr_get(arr_anime_names, i),
+			ptrarr_get(arr_anime_names_eng, i),
+			(char *) ptrarr_get(arr_anime_names_eng, i)
+		);
 
 		child = child->next;
 		if(child == NULL)

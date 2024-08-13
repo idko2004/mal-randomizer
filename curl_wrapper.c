@@ -27,7 +27,6 @@ CurlResponse * new_CurlResponse(int response_is_text)
 	if(response_is_text == 1)
 	{
 		response->is_text = 1;
-		response->content_as_text = (char *) response->content;
 	}
 	return response;
 }
@@ -59,8 +58,8 @@ size_t write_curl_response_callback(void * buffer, size_t size, size_t nmemb, vo
 
 	if(response->is_text)
 	{
-		response->content_as_text = response->content; //Asegurarse de que los dos punteros siempre sean iguales, ya que content puede moverse con realloc
-		response->content_as_text[response->size] = '\0';
+		char * content_as_text = response->content;
+		content_as_text[response->size] = '\0';
 	}
 
 	return realsize;
@@ -93,37 +92,37 @@ int curlw_easy_download(char * url, CurlResponse * curl_response)
 	curl = curl_easy_init();
 	if(curl == NULL)
 	{
-		fprintf(stderr, "[ERROR] curl_get_as_text: Failed to create an easy curl\n");
+		fprintf(stderr, "[ERROR] curlw_easy_download: Failed to create an easy curl\n");
 		return -1;
 	}
 
 	if(curl_easy_setopt(curl, CURLOPT_URL, url) != CURLE_OK)
 	{
-		fprintf(stderr, "[ERROR] curl_get_as_text: Failed to set option to curl: CURLOPT_URL.\n");
+		fprintf(stderr, "[ERROR] curlw_easy_download: Failed to set option to curl: CURLOPT_URL.\n");
 		return -1;
 	}
 
 	//Especificar la función que va a usar curl de callback para escribir el contenido de la respuesta
 	if(curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_curl_response_callback) != CURLE_OK)
 	{
-		fprintf(stderr, "[ERROR] curl_get_as_text: Failed to set option to curl: CURLOPT_WRITEFUNCTION.\n");
+		fprintf(stderr, "[ERROR] curlw_easy_download: Failed to set option to curl: CURLOPT_WRITEFUNCTION.\n");
 		return -1;
 	}
 
 	//Pasarle el pointer del struct que curl va a usar para pasarle datos a la función que especificamos de callback
 	if(curl_easy_setopt(curl, CURLOPT_WRITEDATA, curl_response) != CURLE_OK)
 	{
-		fprintf(stderr, "[ERROR] curl_get_as_text: Failed to set option to curl: CURLOPT_WRITEDATA.\n");
+		fprintf(stderr, "[ERROR] curlw_easy_download: Failed to set option to curl: CURLOPT_WRITEDATA.\n");
 		return -1;
 	}
 	
 	#ifdef _WIN32
 		//Abrir certificado CA de myanimelist.net sino no se puede establecer una conexión HTTPS en windows por algún motivo
-		fprintf(stderr, "[INFO] curl_get_as_text: Setting CURLOPT_CAINFO.\n");
+		fprintf(stderr, "[INFO] curlw_easy_download: Setting CURLOPT_CAINFO.\n");
 
 		if(curl_easy_setopt(curl, CURLOPT_CAINFO, get_cert_name(url)) != CURLE_OK)
 		{
-			fprintf(stderr, "[ERROR] curl_get_as_text: Failed to set option to curl: CURLOPT_CAINFO.\n");
+			fprintf(stderr, "[ERROR] curlw_easy_download: Failed to set option to curl: CURLOPT_CAINFO.\n");
 			return -1;
 		}
 	#endif
@@ -131,11 +130,11 @@ int curlw_easy_download(char * url, CurlResponse * curl_response)
 	curl_result = curl_easy_perform(curl);
 	if(curl_result != CURLE_OK)
 	{
-		fprintf(stderr, "[ERROR] curl_get_as_text: Failed to easy perform on curl with code %i.\n", curl_result);
+		fprintf(stderr, "[ERROR] curlw_easy_download: Failed to easy perform on curl with code %i.\n", curl_result);
 		return -1;
 	}
 
-	fprintf(stderr, "[INFO] curl_get_as_text: Looks like the download from %s succeeded.\n", url);
+	fprintf(stderr, "[INFO] curlw_easy_download: Looks like the download from %s succeeded.\n", url);
 
 	return 0;
 }

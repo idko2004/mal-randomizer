@@ -17,7 +17,7 @@ int download_and_show_image(char * image_url, GtkBuilder * builder)
 	if(image_response->content == NULL)
 	{
 		fprintf(stderr, "[ERROR] download_and_show_image: Somehow the contents of the image are not present.\n");
-		return 1;
+		return -1;
 	}
 
 	//Load the image to a pixbuf
