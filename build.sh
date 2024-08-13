@@ -18,8 +18,8 @@ fi
 echo -e "${YELLOW}Compiling cJSON${NOCOLOR}"
 gcc -c cJSON/cJSON.c -o "${MATERIALS}/cJSON.o"
 
-echo -e "${YELLOW}Compiling strarr${NOCOLOR}"
-gcc -c strarr.c -o "${MATERIALS}/strarr.o"
+echo -e "${YELLOW}Compiling ptrarr${NOCOLOR}"
+gcc -c ptrarr.c -o "${MATERIALS}/ptrarr.o"
 
 echo -e "${YELLOW}Compiling curl_wrapper${NOCOLOR}"
 gcc -c curl_wrapper.c -o "${MATERIALS}/curl_wrapper.o"
@@ -40,7 +40,7 @@ echo -e "${YELLOW}Compiling image${NOCOLOR}"
 gcc -c image.c -o "${MATERIALS}/image.o" `pkg-config --cflags --libs gtk+-3.0`
 
 echo -e "${YELLOW}Compiling main${NOCOLOR}"
-gcc "${MATERIALS}/cJSON.o" "${MATERIALS}/strarr.o" "${MATERIALS}/curl_wrapper.o" "${MATERIALS}/text_parser.o" "${MATERIALS}/process_anime.o" "${MATERIALS}/seed.o" "${MATERIALS}/random.o" "${MATERIALS}/image.o" main.c -o "${BUILD}/mal-randomizer" `pkg-config --cflags --libs gtk+-3.0` `curl-config --cflags --libs`
+gcc "${MATERIALS}/cJSON.o" "${MATERIALS}/ptrarr.o" "${MATERIALS}/curl_wrapper.o" "${MATERIALS}/text_parser.o" "${MATERIALS}/process_anime.o" "${MATERIALS}/seed.o" "${MATERIALS}/random.o" "${MATERIALS}/image.o" main.c -o "${BUILD}/mal-randomizer" `pkg-config --cflags --libs gtk+-3.0` `curl-config --cflags --libs`
 
 if [ $? -eq 0 ]; then
 	echo -e "${GREEN}Done!${NOCOLOR}"

@@ -7,17 +7,17 @@
 
 #include "cJSON/cJSON.h"
 
-#include "strarr.h"
+#include "ptrarr.h"
 
 AnimeArrays * process_anime(cJSON * mal_data_items_json) //Guarda los animes del json en varias arrays
 {
-	Strarr * arr_anime_names = strarr_new(10);
-	Strarr * arr_anime_names_eng = strarr_new(10);
-	Strarr * arr_anime_urls = strarr_new(10);
-	Strarr * arr_anime_images_paths = strarr_new(10);
+	Ptrarr * arr_anime_names = ptrarr_new(10);
+	Ptrarr * arr_anime_names_eng = ptrarr_new(10);
+	Ptrarr * arr_anime_urls = ptrarr_new(10);
+	Ptrarr * arr_anime_images_paths = ptrarr_new(10);
 	if(arr_anime_names == NULL || arr_anime_urls == NULL || arr_anime_images_paths == NULL)
 	{
-		fprintf(stderr, "[INFO] process_anime: Failed to create Strarr.\n");
+		fprintf(stderr, "[INFO] process_anime: Failed to create Ptrarr.\n");
 		return NULL;
 	}
 
@@ -27,6 +27,9 @@ AnimeArrays * process_anime(cJSON * mal_data_items_json) //Guarda los animes del
 	cJSON * anime_url;
 	cJSON * anime_image_path;
 	int push_result = 0;
+	int i = 0;
+
+	printf("-- Listing all entries:\n");
 
 	while(1)
 	{
@@ -40,16 +43,63 @@ AnimeArrays * process_anime(cJSON * mal_data_items_json) //Guarda los animes del
 			return NULL;
 		}
 
-		push_result = strarr_push(arr_anime_names, anime_title->valuestring);
+		printf("%i: %s | %s\n", i, anime_title->valuestring, anime_title_eng->valuestring);
 
-		if(strcmp(anime_title_eng->valuestring, "") == 0) push_result += strarr_push(arr_anime_names_eng, anime_title->valuestring); //Guardar el nombre en japonés si no hay nombre en inglés.
-		else push_result += strarr_push(arr_anime_names_eng, anime_title_eng->valuestring);
+		char * anime_name_jp_copy = malloc(sizeof(char) * strlen(anime_title->valuestring) +1);
+		if(anime_name_jp_copy == NULL)
+		{
+			fprintf(stderr, "[ERROR] process_anime: Failed to allocate space to copy string.\n");
+			return NULL;
+		}
+		strcpy(anime_name_jp_copy, anime_title->valuestring);
+		push_result = ptrarr_push(arr_anime_names, anime_name_jp_copy);
 
-		push_result += strarr_push(arr_anime_urls, anime_url->valuestring);
-		push_result += strarr_push(arr_anime_images_paths, anime_image_path->valuestring);
+		if(strcmp(anime_title_eng->valuestring, "") == 0)
+		{
+			//Guardar el nombre en japonés si no hay nombre en inglés.
+			char * anime_name_en_copy = malloc(sizeof(char) * strlen(anime_title->valuestring) + 1);
+			if(anime_name_en_copy == NULL)
+			{
+				fprintf(stderr, "[ERROR] process_anime: Failed to allocate space to copy string.\n");
+				return NULL;
+			}
+			strcpy(anime_name_en_copy, anime_title->valuestring);
+			push_result += ptrarr_push(arr_anime_names_eng, anime_name_en_copy);
+			fprintf(stderr, "[INFO] process_anime: anime %s will use jp name only.\n", anime_title->valuestring);
+		}
+		else
+		{
+			char * anime_name_en_copy = malloc(sizeof(char) * strlen(anime_title_eng->valuestring) +1);
+			if(anime_name_en_copy == NULL)
+			{
+				fprintf(stderr, "[ERROR] process_anime: Failed to allocate space to copy string.\n");
+				return NULL;
+			}
+			strcpy(anime_name_en_copy, anime_title_eng->valuestring);
+			push_result += ptrarr_push(arr_anime_names_eng, anime_name_en_copy);
+		}
+
+		char * anime_url_copy = malloc(sizeof(char) * strlen(anime_url->valuestring) + 1);
+		if(anime_url_copy == NULL)
+		{
+			fprintf(stderr, "[ERROR] process_anime: Failed to allocate space to copy string.\n");
+			return NULL;
+		}
+		strcpy(anime_url_copy, anime_url->valuestring);
+		push_result += ptrarr_push(arr_anime_urls, anime_url_copy);
+
+		char * image_path_copy = malloc(sizeof(char) * strlen(anime_image_path->valuestring) + 1);
+		if(image_path_copy == NULL)
+		{
+			fprintf(stderr, "[ERROR] process_anime: Failed to allocate space to copy string.\n");
+			return NULL;
+		}
+		strcpy(image_path_copy, anime_image_path->valuestring);
+		push_result += ptrarr_push(arr_anime_images_paths, image_path_copy);
+
 		if(push_result > 0)
 		{
-			fprintf(stderr, "[ERROR] process_anime: Failed to push to strarr %i times.\n", push_result);
+			fprintf(stderr, "[ERROR] process_anime: Failed to push to ptrarr %i times.\n", push_result);
 			return NULL;
 		}
 
@@ -58,10 +108,12 @@ AnimeArrays * process_anime(cJSON * mal_data_items_json) //Guarda los animes del
 		{
 			break;
 		}
+
+		i++;
 	}
 
-	strarr_print_all(arr_anime_names);
-	strarr_print_all(arr_anime_names_eng);
+	//strarr_print_all(arr_anime_names);
+	//strarr_print_all(arr_anime_names_eng);
 
 	AnimeArrays * result = malloc(sizeof(AnimeArrays));
 	result->arr_anime_names = arr_anime_names;

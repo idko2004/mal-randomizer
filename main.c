@@ -11,7 +11,7 @@
 
 #include "glib-object.h"
 #include "glib.h"
-#include "strarr.h"
+#include "ptrarr.h"
 #include "ui/gtk_builder_ui.h"
 #include "curl_wrapper.h"
 #include "text_parser.h"
@@ -40,13 +40,13 @@ void clean()
 	{
 		if(global_data_to_parse_mal->anime_arrays != NULL)
 		{
-			if(global_data_to_parse_mal->anime_arrays->arr_anime_names != NULL) strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_names);
+			if(global_data_to_parse_mal->anime_arrays->arr_anime_names != NULL) ptrarr_destroy(global_data_to_parse_mal->anime_arrays->arr_anime_names);
 
-			if(global_data_to_parse_mal->anime_arrays->arr_anime_names_eng != NULL) strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_names_eng);
+			if(global_data_to_parse_mal->anime_arrays->arr_anime_names_eng != NULL) ptrarr_destroy(global_data_to_parse_mal->anime_arrays->arr_anime_names_eng);
 
-			if(global_data_to_parse_mal->anime_arrays->arr_anime_images_paths != NULL) strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_images_paths);
+			if(global_data_to_parse_mal->anime_arrays->arr_anime_images_paths != NULL) ptrarr_destroy(global_data_to_parse_mal->anime_arrays->arr_anime_images_paths);
 
-			if(global_data_to_parse_mal->anime_arrays->arr_anime_urls != NULL) strarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_urls);
+			if(global_data_to_parse_mal->anime_arrays->arr_anime_urls != NULL) ptrarr_destroy(global_data_to_parse_mal->anime_arrays->arr_anime_urls);
 
 			free(global_data_to_parse_mal->anime_arrays);
 		}
@@ -81,7 +81,7 @@ int open_anime_in_browser()
 	}
 
 	char * url_base = "https://myanimelist.net%s";
-	char * anime_url = strarr_get(global_data_to_parse_mal->anime_arrays->arr_anime_urls, index_anime);
+	char * anime_url = ptrarr_get(global_data_to_parse_mal->anime_arrays->arr_anime_urls, index_anime);
 	if(anime_url == NULL)
 	{
 		fprintf(stderr, "[ERROR] global_data_to_parse_mal: Failed to get anime_id.\n");
@@ -125,11 +125,22 @@ int show_random_anime()
 
 	fprintf(stderr, "[INFO] show_random_anime: %i\n", i);
 
-	char * jp_name_bad = strarr_get(data_to_parse_mal->anime_arrays->arr_anime_names, i);
-	char * en_name_bad = strarr_get(data_to_parse_mal->anime_arrays->arr_anime_names_eng, i);
+	char * jp_name_bad = ptrarr_get(data_to_parse_mal->anime_arrays->arr_anime_names, i);
+	char * en_name_bad = ptrarr_get(data_to_parse_mal->anime_arrays->arr_anime_names_eng, i);
 
-	if(jp_name_bad == NULL) jp_name_bad = "Failed to get an anime :c";
-	if(en_name_bad == NULL) en_name_bad = jp_name_bad;
+	if(jp_name_bad == NULL || strcmp(jp_name_bad, "\0") == 0)
+	{
+		fprintf(stderr, "[ERROR] show_random_anime: Failed to get japanese anime name of index %i\n", i);
+		jp_name_bad = "Failed to get an anime :c";
+	}
+	if(en_name_bad == NULL || strcmp(en_name_bad, "\0") == 0)
+	{
+		fprintf(stderr, "[ERROR] show_random_anime: Failed to get english anime name of index %i\n", i);
+		en_name_bad = jp_name_bad;
+	}
+
+	fprintf(stderr, "[INFO] anime name jp: %s\n", jp_name_bad);
+	fprintf(stderr, "[INFO] anime name en: %s\n", en_name_bad);
 
 	char * jp_name = replace_all("&#039;", "'", jp_name_bad);
 	char * en_name = replace_all("&#039;", "'", en_name_bad);
@@ -145,6 +156,9 @@ int show_random_anime()
 	strcpy(jp_name_copy, jp_name);
 	strcpy(en_name_copy, en_name);
 
+	fprintf(stderr, "[INFO] formated and copied anime name jp: %s\n", jp_name_copy);
+	fprintf(stderr, "[INFO] formated and copied anime name en: %s\n", en_name_copy);
+
 	const char * markup_format_jp = "<span font_weight=\"bold\" font_size=\"16000\">%s</span>";
 	char * markup_jp = g_markup_printf_escaped(markup_format_jp, jp_name_copy);
 	gtk_label_set_markup(GTK_LABEL(label_jp), markup_jp);
@@ -155,8 +169,8 @@ int show_random_anime()
 	gtk_label_set_markup(GTK_LABEL(label_en), markup_en);
 	g_free(markup_en);
 
-	char * image_url = strarr_get(data_to_parse_mal->anime_arrays->arr_anime_images_paths, i);
-	if(image_url != NULL)
+	char * image_url = ptrarr_get(data_to_parse_mal->anime_arrays->arr_anime_images_paths, i);
+	if(image_url != NULL || strcmp(image_url, "\0") != 0)
 	{
 		download_and_show_image(image_url, data_to_parse_mal->builder);
 	}
@@ -368,6 +382,7 @@ void click_go_button(GtkWidget * widget, void * callback_arg)
 
 void click_reroll_button(GtkWidget * widget, void * callback_arg)
 {
+	fprintf(stderr, "[INFO] NEW ROLL\n");
 	if(global_data_to_parse_mal == NULL)
 	{
 		fprintf(stderr, "[ERROR] click_reroll_button: global_data_to_parse_mal was not defined so can't proceed.\n");
