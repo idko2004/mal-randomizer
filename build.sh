@@ -10,9 +10,14 @@ NOCOLOR="\033[0m"
 mkdir -p $MATERIALS
 
 if [[ "${SKIP_NODE}" != "1" ]]; then
-	echo -e "${YELLOW}Generating GTK UI${NOCOLOR}"
+	echo -e "${YELLOW}Embedding GTK UI${NOCOLOR}"
 	#This generates the file ui/gtk_builder_ui.h from gtkbuilder.ui, basically embeds the xml ui file into the program.
 	node ui/generate_ui_in_header.js
+
+	if [ $? != 0 ]; then
+		echo -e "${RED}Embedding of UI failed!${NOCOLOR}"
+		echo -e "This step ejecutes a little node.js script that creates the file 'ui/gtk_builder_ui.h' and embeds the contents of 'ui/gtkbuilder.ui' on it. This is done to make editing the ui easier and not having to carry around the ui file with the executable. Without this step compilation will fail unless you embed the ui manually or something."
+	fi
 fi
 
 echo -e "${YELLOW}Compiling cJSON${NOCOLOR}"
