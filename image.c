@@ -35,4 +35,6 @@ int download_and_show_image(char * image_url, GtkBuilder * builder)
 
 	GObject * gtk_image = gtk_builder_get_object(builder, "animeImage");
 	gtk_image_set_from_pixbuf(GTK_IMAGE(gtk_image), pixbuf);
+
+	return 0;
 }

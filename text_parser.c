@@ -113,8 +113,16 @@ char * replace_text(char * target, char * replace_with, char * text, long int * 
 char * replace_all(char * target, char * replace_with, char * text)
 {
 	fprintf(stderr, "[INFO] replace_all: starting to replace %s\n", target);
-	//printf("[INFO] replace_all: how it enters:\n%s\n", text);
-	char * last_iteration = text;
+
+	char * text_copy = malloc(sizeof(char) * (strlen(text) + 1));
+	if(text_copy == NULL)
+	{
+		fprintf(stderr, "[ERROR] replace_all: Failed to allocate for copy of text.\n");
+		return NULL;
+	}
+	strcpy(text_copy, text);
+
+	char * last_iteration = text_copy;
 	long int last_position_found = 0;
 	long int i = 0;
 	while(1)
@@ -123,14 +131,10 @@ char * replace_all(char * target, char * replace_with, char * text)
 		if(result == NULL)
 		{
 			fprintf(stderr, "[INFO] replace_all: seems like there is no more %s, at least i hope so.\n[INFO] replace_all: replaced %li times.\n", target, i);
-			//printf("[INFO] replace_all: how it exits:\n%s\n", last_iteration);
 			return last_iteration;
 		}
 
-		if(last_iteration != text) //No liberar el string original que nos pasaron ya que no sabemos cómo se creó.
-		{
-			free(last_iteration);
-		}
+		free(last_iteration);
 		last_iteration = result;
 		i++;
 	}
