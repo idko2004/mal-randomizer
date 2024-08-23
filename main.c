@@ -14,7 +14,6 @@
 #include "curl_wrapper.h"
 #include "text_parser.h"
 #include "process_anime.h"
-#include "seed.h"
 #include "random.h"
 #include "image.h"
 
@@ -377,8 +376,6 @@ void click_reroll_button(GtkWidget * widget, void * callback_arg)
 
 int main(int argc, char ** argv)
 {
-	generate_seed();
-
 	GtkBuilder * builder;
 	GError * error = NULL;
 
@@ -405,6 +402,8 @@ int main(int argc, char ** argv)
 
 	GObject * error_button = gtk_builder_get_object(GTK_BUILDER(builder), "errorButton");
 	g_signal_connect(error_button, "clicked", G_CALLBACK(gtk_main_quit), NULL);
+
+	generate_seed();
 
 	gtk_main();
 

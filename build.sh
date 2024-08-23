@@ -1,6 +1,13 @@
 #! /bin/bash
-BUILD="build"
-MATERIALS="${BUILD}/materials"
+if [[ "${OS}" != "Windows_NT" ]]; then
+	# No es windows, probablemente sea linux
+	BUILD="build"
+	MATERIALS="${BUILD}/materials"
+else
+	# Es windows
+	BUILD="build/Windows/bin"
+	MATERIALS="build/materials"
+fi
 
 YELLOW="\033[1;33m"
 GREEN="\033[1;32m"
@@ -35,9 +42,6 @@ gcc -c -Wall -Werror -ggdb text_parser.c -o "${MATERIALS}/text_parser.o"
 echo -e "${YELLOW}Compiling process_anime${NOCOLOR}"
 gcc -c -Wall -Werror -ggdb process_anime.c -o "${MATERIALS}/process_anime.o"
 
-echo -e "${YELLOW}Compiling seed${NOCOLOR}"
-gcc -c -Wall -Werror -ggdb seed.c -o "${MATERIALS}/seed.o"
-
 echo -e "${YELLOW}Compiling random${NOCOLOR}"
 gcc -c -Wall -Werror -ggdb random.c -o "${MATERIALS}/random.o"
 
@@ -45,7 +49,7 @@ echo -e "${YELLOW}Compiling image${NOCOLOR}"
 gcc -c -Wall -Werror -ggdb image.c -o "${MATERIALS}/image.o" `pkg-config --cflags --libs gtk+-3.0`
 
 echo -e "${YELLOW}Compiling main${NOCOLOR}"
-gcc -Wall -Werror -ggdb "${MATERIALS}/cJSON.o" "${MATERIALS}/ptrarr.o" "${MATERIALS}/curl_wrapper.o" "${MATERIALS}/text_parser.o" "${MATERIALS}/process_anime.o" "${MATERIALS}/seed.o" "${MATERIALS}/random.o" "${MATERIALS}/image.o" main.c -o "${BUILD}/mal-randomizer" `pkg-config --cflags --libs gtk+-3.0` `curl-config --cflags --libs`
+gcc -Wall -Werror -ggdb "${MATERIALS}/cJSON.o" "${MATERIALS}/ptrarr.o" "${MATERIALS}/curl_wrapper.o" "${MATERIALS}/text_parser.o" "${MATERIALS}/process_anime.o" "${MATERIALS}/random.o" "${MATERIALS}/image.o" main.c -o "${BUILD}/mal-randomizer" `pkg-config --cflags --libs gtk+-3.0` `curl-config --cflags --libs`
 
 if [ $? -eq 0 ]; then
 	echo -e "${GREEN}Done!${NOCOLOR}"
