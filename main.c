@@ -9,8 +9,6 @@
 
 #include "cJSON/cJSON.h"
 
-#include "glib-object.h"
-#include "glib.h"
 #include "ptrarr.h"
 #include "ui/gtk_builder_ui.h"
 #include "curl_wrapper.h"
@@ -21,7 +19,7 @@
 #include "image.h"
 
 #define MARKUP_FORMAT_JP "<span font_weight=\"bold\" font_size=\"16000\">%s</span>"
-#define MARKUP_FORAT_EN "<span font_size=\"12000\">%s</span>"
+#define MARKUP_FORMAT_EN "<span font_size=\"12000\">%s</span>"
 
 typedef struct
 {
@@ -154,7 +152,7 @@ int show_random_anime()
 	char * markup_jp = g_markup_printf_escaped(MARKUP_FORMAT_JP, jp_name);
 	gtk_label_set_markup(GTK_LABEL(label_jp), markup_jp);
 
-	char * markup_en = g_markup_printf_escaped(MARKUP_FORAT_EN, en_name);
+	char * markup_en = g_markup_printf_escaped(MARKUP_FORMAT_EN, en_name);
 	gtk_label_set_markup(GTK_LABEL(label_en), markup_en);
 
 	char * image_url = ptrarr_get(data_to_parse_mal->anime_arrays->arr_anime_images_paths, i);
@@ -297,17 +295,6 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 	free_CurlResponse(mal_page);
 
 	return NULL;
-/*
-	strarr_destroy_everything(anime_arrays->arr_anime_names);
-	strarr_destroy_everything(anime_arrays->arr_anime_names_eng);
-	strarr_destroy_everything(anime_arrays->arr_anime_images_paths);
-	strarr_destroy_everything(anime_arrays->arr_anime_urls);
-	free(anime_arrays);
-	free(mal_data_items);
-	cJSON_Delete(mal_json);
-	free_CurlResponse(mal_page);
-	curl_global_cleanup();
-*/
 }
 
 void * rerollAnime(void * builder_ptr)
