@@ -6,8 +6,12 @@
 
 #include "process_anime.h"
 
+int srand_configured = -1;
+
 int random_zero_to_max(int max)
 {
+	if(srand_configured != 0) generate_seed();
+
 	int r = rand();
 	fprintf(stderr, "[INFO] random_zero_to_max: rand = %i\n", r);
 	r = r % max;
@@ -26,7 +30,7 @@ void generate_seed()
 {
 
 	time_t t = time(NULL);
-	fprintf(stderr, "[INFO] generate_seed: time = %i", (int) t);
+	fprintf(stderr, "[INFO] generate_seed: time = %i\n", (int) t);
 	srand(t);
 }
 

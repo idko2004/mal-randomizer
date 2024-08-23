@@ -403,8 +403,6 @@ int main(int argc, char ** argv)
 	GObject * error_button = gtk_builder_get_object(GTK_BUILDER(builder), "errorButton");
 	g_signal_connect(error_button, "clicked", G_CALLBACK(gtk_main_quit), NULL);
 
-	generate_seed();
-
 	gtk_main();
 
 	clean();
