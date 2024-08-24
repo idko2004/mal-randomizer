@@ -387,12 +387,14 @@ int main(int argc, char ** argv)
 {
 	fprintf(stderr, "hi :3\n");
 
+	#ifdef _WIN32
 	if(HIDE_CMD_ON_WINDOWS == 1) //Hide console on windows because windows makes sense...
 	{
 		HWND console_window = GetConsoleWindow();
 		ShowWindow(console_window, SW_HIDE);
 		fprintf(stderr, "[EASTER EGG?] This has to be a secret, theres no way to see this, right?.\n");
 	}
+	#endif
 
 	GtkBuilder * builder;
 	GError * error = NULL;
