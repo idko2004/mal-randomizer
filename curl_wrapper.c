@@ -7,6 +7,9 @@
 
 #include "text_parser.h"
 
+#define MAIN_PAGE_CERT_FILE "certs/myanimelist-net.pem";
+#define CDN_CERT_FILE "certs/cdn-myanimelist-net.pem";
+
 CurlResponse * new_CurlResponse(int response_is_text)
 {
 	CurlResponse * response = malloc(sizeof(CurlResponse));
@@ -67,18 +70,15 @@ size_t write_curl_response_callback(void * buffer, size_t size, size_t nmemb, vo
 
 char * get_cert_name(char * url)
 {
-	char * main_page_cert = "myanimelist-net.pem";
-	char * cdn_cert = "cdn-myanimelist-net.pem";
-
 	if(find_in_text("cdn.myanimelist.net", url, 0) != -1)
 	{
 		fprintf(stderr, "[INFO] using cert file: cdn-myanimelist-net.pem\n");
-		return cdn_cert;
+		return CDN_CERT_FILE;
 	}
 	else
 	{
 		fprintf(stderr, "[INFO] using cert file: myanimelist-net.pem\n");
-		return main_page_cert;
+		return MAIN_PAGE_CERT_FILE;
 	}
 }
 

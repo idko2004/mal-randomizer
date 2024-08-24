@@ -1,3 +1,4 @@
 build/*
 mal.txt
 ui/gtk_builder_ui.h
+ui/resources.h

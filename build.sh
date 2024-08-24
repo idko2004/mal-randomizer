@@ -27,6 +27,9 @@ if [[ "${SKIP_NODE}" != "1" ]]; then
 	fi
 fi
 
+echo -e "${YELLOW}Generating resources file${NOCOLOR}"
+glib-compile-resources ui/gresource.xml --generate-source --target=ui/resources.h
+
 echo -e "${YELLOW}Compiling cJSON${NOCOLOR}"
 gcc -c cJSON/cJSON.c -o "${MATERIALS}/cJSON.o"
 
