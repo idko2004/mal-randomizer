@@ -3,6 +3,8 @@
 	<object id="window" class="GtkWindow">
 		<property name="visible">True</property>
 		<property name="title">MAL-randomizer</property>
+		<property name="default-width">650</property>
+		<property name="default-height">600</property>
 		<child>
 			<object id="stack" class="GtkStack">
 				<property name="visible">True</property>

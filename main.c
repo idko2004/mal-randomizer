@@ -20,6 +20,15 @@
 #define MARKUP_FORMAT_JP "<span font_weight=\"bold\" font_size=\"16000\">%s</span>"
 #define MARKUP_FORMAT_EN "<span font_size=\"12000\">%s</span>"
 
+#ifdef _WIN32
+	#include <windows.h>
+	#define HIDE_CMD_ON_WINDOWS 1
+	// 1 = hide
+#else
+	#define HIDE_CMD_ON_WINDOWS -1
+#endif
+
+
 typedef struct
 {
 	const char * username; //in
@@ -376,6 +385,15 @@ void click_reroll_button(GtkWidget * widget, void * callback_arg)
 
 int main(int argc, char ** argv)
 {
+	fprintf(stderr, "hi :3\n");
+
+	if(HIDE_CMD_ON_WINDOWS == 1) //Hide console on windows because windows makes sense...
+	{
+		HWND console_window = GetConsoleWindow();
+		ShowWindow(console_window, SW_HIDE);
+		fprintf(stderr, "[EASTER EGG?] This has to be a secret, theres no way to see this, right?.\n");
+	}
+
 	GtkBuilder * builder;
 	GError * error = NULL;
 
