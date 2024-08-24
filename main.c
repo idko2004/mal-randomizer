@@ -11,7 +11,6 @@
 
 #include "ptrarr.h"
 #include "ui/gtk_builder_ui.h"
-#include "ui/resources.h"
 #include "curl_wrapper.h"
 #include "text_parser.h"
 #include "process_anime.h"
@@ -405,10 +404,6 @@ int main(int argc, char ** argv)
 
 	GObject * error_button = gtk_builder_get_object(GTK_BUILDER(builder), "errorButton");
 	g_signal_connect(error_button, "clicked", G_CALLBACK(gtk_main_quit), NULL);
-
-	//Set window icon
-	GdkPixbuf * favicon_pixbuf = gdk_pixbuf_new_from_resource("resource:///io/github/idko2004/mal-randomizer/favicon.jpg", NULL);
-	gtk_window_set_icon(GTK_WINDOW(window), favicon_pixbuf);
 
 	gtk_main();
 

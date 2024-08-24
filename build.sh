@@ -1,12 +1,12 @@
 #! /bin/bash
-if [[ "${OS}" != "Windows_NT" ]]; then
-	# No es windows, probablemente sea linux
-	BUILD="build"
-	MATERIALS="${BUILD}/materials"
-else
+if [[ "${OS}" == "Windows_NT" ]]; then
 	# Es windows
 	BUILD="build/Windows/bin"
 	MATERIALS="build/materials"
+else
+	# No es windows, probablemente sea linux
+	BUILD="build"
+	MATERIALS="${BUILD}/materials"
 fi
 
 YELLOW="\033[1;33m"
@@ -27,8 +27,10 @@ if [[ "${SKIP_NODE}" != "1" ]]; then
 	fi
 fi
 
-echo -e "${YELLOW}Generating resources file${NOCOLOR}"
-glib-compile-resources ui/gresource.xml --generate-source --target=ui/resources.h
+if [[ "${OS}" == "Windows_NT" ]]; then
+	echo -e "${YELLOW}Generating Windows resource file${NOCOLOR}"
+	windres ui/windows_resources.rc -o "${MATERIALS}/windres.o"
+fi
 
 echo -e "${YELLOW}Compiling cJSON${NOCOLOR}"
 gcc -c cJSON/cJSON.c -o "${MATERIALS}/cJSON.o"
@@ -52,7 +54,7 @@ echo -e "${YELLOW}Compiling image${NOCOLOR}"
 gcc -c -Wall -Werror -ggdb image.c -o "${MATERIALS}/image.o" `pkg-config --cflags --libs gtk+-3.0`
 
 echo -e "${YELLOW}Compiling main${NOCOLOR}"
-gcc -Wall -Werror -ggdb "${MATERIALS}/cJSON.o" "${MATERIALS}/ptrarr.o" "${MATERIALS}/curl_wrapper.o" "${MATERIALS}/text_parser.o" "${MATERIALS}/process_anime.o" "${MATERIALS}/random.o" "${MATERIALS}/image.o" main.c -o "${BUILD}/mal-randomizer" `pkg-config --cflags --libs gtk+-3.0` `curl-config --cflags --libs`
+gcc -Wall -Werror -ggdb "${MATERIALS}/cJSON.o" "${MATERIALS}/ptrarr.o" "${MATERIALS}/curl_wrapper.o" "${MATERIALS}/text_parser.o" "${MATERIALS}/process_anime.o" "${MATERIALS}/random.o" "${MATERIALS}/image.o" "${MATERIALS}/windres.o" main.c -o "${BUILD}/mal-randomizer" `pkg-config --cflags --libs gtk+-3.0` `curl-config --cflags --libs`
 
 if [ $? -eq 0 ]; then
 	echo -e "${GREEN}Done!${NOCOLOR}"
