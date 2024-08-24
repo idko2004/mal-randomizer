@@ -407,7 +407,7 @@ int main(int argc, char ** argv)
 	g_signal_connect(error_button, "clicked", G_CALLBACK(gtk_main_quit), NULL);
 
 	//Set window icon
-	GdkPixbuf * favicon_pixbuf = gdk_pixbuf_new_from_resource("resource:///io/github/idko2004/mal-randomizer/img/favicon.jpg", NULL);
+	GdkPixbuf * favicon_pixbuf = gdk_pixbuf_new_from_resource("resource:///io/github/idko2004/mal-randomizer/favicon.jpg", NULL);
 	gtk_window_set_icon(GTK_WINDOW(window), favicon_pixbuf);
 
 	gtk_main();

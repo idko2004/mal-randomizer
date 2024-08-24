@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
 	<gresource prefix="/io/github/idko2004/mal-randomizer">
-		<file>img/favicon.jpg</file>
+		<file alias="favicon.jpg">ui/img/favicon.jpg</file>
 	</gresource>
 </gresources>
