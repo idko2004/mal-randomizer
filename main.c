@@ -317,6 +317,8 @@ int is_username_valid(const char * username)
 
 void click_go_button(GtkWidget * widget, void * callback_arg)
 {
+	gtk_widget_set_sensitive(widget, FALSE); //Desactivar el botón para que no se pueda activar otra vez, ya que, por ejemplo, si se pone el foco sobre el botón con el teclado y se spamea la tecla enter, en lo que dura la animación es posible activar el botón varias veces.
+
 	fprintf(stderr, "[INFO] Go button was clicked.\n");
 
 	GObject * stack = gtk_builder_get_object(GTK_BUILDER(callback_arg), "stack");
@@ -343,6 +345,7 @@ void click_go_button(GtkWidget * widget, void * callback_arg)
 	{
 		fprintf(stderr, "[INFO] username is not valid.\n");
 		gtk_widget_grab_focus(GTK_WIDGET(username_entry));
+		gtk_widget_set_sensitive(widget, TRUE);
 		return;
 	}
 
