@@ -304,6 +304,17 @@ void * rerollAnime(void * builder_ptr)
 	return NULL;
 }
 
+int is_username_valid(const char * username)
+{
+	//Está vacío
+	if(strcmp(username, "") == 0) return -1;
+
+	//Tiene un espacio
+	if(find_in_text(" ", username, 0) != -1) return -1;
+
+	return 0;
+}
+
 void click_go_button(GtkWidget * widget, void * callback_arg)
 {
 	fprintf(stderr, "[INFO] Go button was clicked.\n");
@@ -328,9 +339,9 @@ void click_go_button(GtkWidget * widget, void * callback_arg)
 	}
 
 	//Si el nombre de usuario está vacío, no hacer nada
-	if(strcmp(username, "") == 0)
+	if(is_username_valid(username) != 0)
 	{
-		fprintf(stderr, "[INFO] username is empty.\n");
+		fprintf(stderr, "[INFO] username is not valid.\n");
 		gtk_widget_grab_focus(GTK_WIDGET(username_entry));
 		return;
 	}
