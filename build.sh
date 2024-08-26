@@ -3,10 +3,14 @@ if [[ "${OS}" == "Windows_NT" ]]; then
 	# Es windows
 	BUILD="build/Windows/bin"
 	MATERIALS="build/materials"
+	COMPILE_FLAGS_MAIN="-Wall -Werror -ggdb -mwindows"
+	PLATFORM_SPECIFIC_OBJ="${MATERIALS}/windres.o"
 else
 	# No es windows, probablemente sea linux
 	BUILD="build"
 	MATERIALS="${BUILD}/materials"
+	COMPILE_FLAGS_MAIN="-Wall -Werror -ggdb"
+	PLATFORM_SPECIFIC_OBJ=""
 fi
 
 YELLOW="\033[1;33m"
@@ -54,7 +58,7 @@ echo -e "${YELLOW}Compiling image${NOCOLOR}"
 gcc -c -Wall -Werror -ggdb image.c -o "${MATERIALS}/image.o" `pkg-config --cflags --libs gtk+-3.0`
 
 echo -e "${YELLOW}Compiling main${NOCOLOR}"
-gcc -Wall -Werror -ggdb -mwindows "${MATERIALS}/cJSON.o" "${MATERIALS}/ptrarr.o" "${MATERIALS}/curl_wrapper.o" "${MATERIALS}/text_parser.o" "${MATERIALS}/process_anime.o" "${MATERIALS}/random.o" "${MATERIALS}/image.o" "${MATERIALS}/windres.o" main.c -o "${BUILD}/mal-randomizer" `pkg-config --cflags --libs gtk+-3.0` `curl-config --cflags --libs`
+gcc `echo $COMPILE_FLAGS_MAIN` `echo $PLATFORM_SPECIFIC_OBJ` "${MATERIALS}/cJSON.o" "${MATERIALS}/ptrarr.o" "${MATERIALS}/curl_wrapper.o" "${MATERIALS}/text_parser.o" "${MATERIALS}/process_anime.o" "${MATERIALS}/random.o" "${MATERIALS}/image.o" main.c -o "${BUILD}/mal-randomizer" `pkg-config --cflags --libs gtk+-3.0` `curl-config --cflags --libs`
 
 if [ $? -eq 0 ]; then
 	echo -e "${GREEN}Done!${NOCOLOR}"
