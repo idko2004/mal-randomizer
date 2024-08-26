@@ -4,23 +4,26 @@
 #include <stdlib.h>
 #include <string.h>
 
-long int find_in_text(char * s, char * input, long int start_at)
+long int find_in_text(const char * target, const char * input, long int start_at)
 {
-	//fprintf(stderr, "[INFO] find_in_text: Trying to find %s\n", s);
+	//fprintf(stderr, "[INFO] find_in_text: Trying to find %s\n", target);
 
-	long int s_length = strlen(s);
+	long int target_length = strlen(target);
 	long int input_length = strlen(input);
 
 	long int matches = 0; //Lleva la cuenta de cuántos caracteres son iguales en s y en input, si matches y s_length - 1 llegan a ser iguales retornamos i
 
 	for(long int i = start_at; i < input_length; i++)
 	{
-		for(long int j = 0; j < s_length; j++)
+		//fprintf(stderr, "big loop\n");
+		for(long int j = 0; j < target_length; j++)
 		{
-			if(input[i + j] == s[j])
+			//fprintf(stderr, "Are %c and %c the same?\n", input[i+j], target[j]);
+			if(input[i + j] == target[j])
 			{
 				matches++;
-				if(matches == s_length - 1)
+				//fprintf(stderr, "They are!! %li\n", matches);
+				if(matches == target_length)
 				{
 					//fprintf(stderr, "[INFO] find_in_text: Found something at index %li\n", i);
 					return i;
