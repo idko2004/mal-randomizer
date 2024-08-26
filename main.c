@@ -312,9 +312,6 @@ void click_go_button(GtkWidget * widget, void * callback_arg)
 	GObject * page2 = gtk_builder_get_object(GTK_BUILDER(callback_arg), "page2");
 	GObject * spinner = gtk_builder_get_object(GTK_BUILDER(callback_arg), "loadingPageSpinner");
 	gtk_stack_set_transition_type(GTK_STACK(stack), GTK_STACK_TRANSITION_TYPE_SLIDE_LEFT_RIGHT);
-	gtk_spinner_start(GTK_SPINNER(spinner));
-	gtk_stack_set_visible_child(GTK_STACK(stack), GTK_WIDGET(page2));
-	
 
 	GObject * username_entry = gtk_builder_get_object(GTK_BUILDER(callback_arg), "username-entry");
 	if(username_entry == NULL)
@@ -329,7 +326,15 @@ void click_go_button(GtkWidget * widget, void * callback_arg)
 		fprintf(stderr, "[ERROR] clickGoButton: Failed to get the contents of username entry.\n");
 		return;
 	}
-	
+
+	//Si el nombre de usuario está vacío, no hacer nada
+	if(strcmp(username, "") == 0)
+	{
+		fprintf(stderr, "[INFO] username is empty.\n");
+		gtk_widget_grab_focus(GTK_WIDGET(username_entry));
+		return;
+	}
+
 	GObject * list_combobox = gtk_builder_get_object(GTK_BUILDER(callback_arg), "anime_list_type");
 	if(list_combobox == NULL)
 	{
@@ -346,14 +351,19 @@ void click_go_button(GtkWidget * widget, void * callback_arg)
 	if(list_selected == 5) list_selected = 6; //Por algún motivo, en myanimelist el status 5 está vacío.
 	fprintf(stderr, "[INFO] username: %s\n[INFO] list: %i\n", username, list_selected);
 
-	pthread_t thread_id;
+	//Hacer la transición
+	gtk_spinner_start(GTK_SPINNER(spinner));
+	gtk_stack_set_visible_child(GTK_STACK(stack), GTK_WIDGET(page2));
 
+	//Crear la estructura en la que se van a guardar los datos
 	DataToParseMal * data_to_parse_mal = malloc(sizeof(DataToParseMal));
 	data_to_parse_mal->builder = (GtkBuilder *) callback_arg;
 	data_to_parse_mal->status = list_selected;
 	data_to_parse_mal->username = username;
 	data_to_parse_mal->anime_arrays = NULL;
 
+	//Descargar y procesar los datos en otro hilo
+	pthread_t thread_id;
 	pthread_create(&thread_id, NULL, download_and_parse_mal, (void *)data_to_parse_mal);
 	pthread_detach(thread_id);
 }
