@@ -228,7 +228,7 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 	char * url = malloc(sizeof(char) * (strlen(url_base) + strlen(username) + 1));
 	sprintf(url, url_base, username, status);
 
-	fprintf(stderr, "[INFO] url = %s", url);
+	fprintf(stderr, "[INFO] url = %s\n", url);
 
 	CurlResponse * mal_page = curlw_get_as_text(url);
 

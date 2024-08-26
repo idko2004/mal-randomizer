@@ -65,7 +65,6 @@ AnimeArrays * process_anime(cJSON * mal_data_items_json) //Guarda los animes del
 			}
 			strcpy(anime_name_en_copy, anime_title->valuestring);
 			push_result += ptrarr_push(arr_anime_names_eng, anime_name_en_copy);
-			fprintf(stderr, "[INFO] process_anime: anime %s will use jp name only.\n", anime_name_en_copy);
 		}
 		else
 		{
