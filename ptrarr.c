@@ -158,13 +158,39 @@ int ptrarr_destroy(Ptrarr * ptrarr)
 {
 	if(ptrarr == NULL)
 	{
-		if(PRINT_DEBUG >= 1) fprintf(stderr, "[ERROR] ptrarr_destroy_everything: can't destroy anything if you give me a null pointer :c\n");
+		if(PRINT_DEBUG >= 1) fprintf(stderr, "[ERROR] ptrarr_destroy: can't destroy anything if you give me a null pointer :c\n");
 		return 1;
 	}
 
 	free(ptrarr);
 
 	return 0;
+}
+
+int ptrarr_destroy_everything(Ptrarr * ptrarr)
+{
+	fprintf(stderr, "[INFO] ptrarr_destroy_everything: Destroying everything...\n");
+
+	if(ptrarr == NULL)
+	{
+		if(PRINT_DEBUG >= 1) fprintf(stderr, "[ERROR] ptrarr_destroy_everything: can't destroy anything if you give me a null pointer :c\n");
+		return 1;
+	}
+
+	void * ptr = NULL;
+
+	for(int i = 0; i < ptrarr->length; i++)
+	{
+		ptr = ptrarr_get(ptrarr, i);
+		if(ptr == NULL)
+		{
+			fprintf(stderr, "[WARN] ptrarr_destroy_everything: pointer in ptrarr at index %i is NULL.\n", i);
+			continue;
+		} 
+		free(ptr);
+	}
+
+	return ptrarr_destroy(ptrarr);
 }
 
 void ptrarr_print_pointers(Ptrarr * ptrarr) //Imprimir punteros.
@@ -182,4 +208,3 @@ void ptrarr_print_pointers(Ptrarr * ptrarr) //Imprimir punteros.
 		printf(">%i = %p\n", i, ptrarr_get(ptrarr, i));
 	}
 }
-

@@ -40,13 +40,13 @@ void clean()
 	{
 		if(global_data_to_parse_mal->anime_arrays != NULL)
 		{
-			if(global_data_to_parse_mal->anime_arrays->arr_anime_names != NULL) ptrarr_destroy(global_data_to_parse_mal->anime_arrays->arr_anime_names);
+			if(global_data_to_parse_mal->anime_arrays->arr_anime_names != NULL) ptrarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_names);
 
-			if(global_data_to_parse_mal->anime_arrays->arr_anime_names_eng != NULL) ptrarr_destroy(global_data_to_parse_mal->anime_arrays->arr_anime_names_eng);
+			if(global_data_to_parse_mal->anime_arrays->arr_anime_names_eng != NULL) ptrarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_names_eng);
 
-			if(global_data_to_parse_mal->anime_arrays->arr_anime_images_paths != NULL) ptrarr_destroy(global_data_to_parse_mal->anime_arrays->arr_anime_images_paths);
+			if(global_data_to_parse_mal->anime_arrays->arr_anime_images_paths != NULL) ptrarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_images_paths);
 
-			if(global_data_to_parse_mal->anime_arrays->arr_anime_urls != NULL) ptrarr_destroy(global_data_to_parse_mal->anime_arrays->arr_anime_urls);
+			if(global_data_to_parse_mal->anime_arrays->arr_anime_urls != NULL) ptrarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_urls);
 
 			free(global_data_to_parse_mal->anime_arrays);
 		}

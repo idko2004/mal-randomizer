@@ -20,6 +20,8 @@ int ptrarr_set(Ptrarr * ptrarr, int index, void * p); //Reemplaza un puntero que
 
 int ptrarr_destroy(Ptrarr * ptrarr); //Libera la memoria del struct
 
+int ptrarr_destroy_everything(Ptrarr * ptrarr); //Asume que los punteros dentro del ptrarr fueron creados con malloc y les hace free a todos, luego ejecuta ptrarr_destroy
+
 void ptrarr_print_pointers(Ptrarr * ptrarr); //Imprimir punteros.
 
 #endif
