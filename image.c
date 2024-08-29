@@ -7,7 +7,13 @@
 
 int download_and_show_image(char * image_url, GtkBuilder * builder)
 {
-	CurlResponse * image_response = curlw_get(image_url);
+	int curl_error_code = 0;
+	CurlResponse * image_response = curlw_get(image_url, &curl_error_code);
+	if(curl_error_code != 0)
+	{
+		fprintf(stderr, "[ERROR] download_and_show_image: Failed to download image: curl code = %i: %s\n", curl_error_code, curlw_get_error_message(curl_error_code));
+		return -1;
+	}
 	if(image_response == NULL)
 	{
 		fprintf(stderr, "[ERROR] download_and_show_image: Failed to download image.\n");

@@ -83,11 +83,12 @@ char * get_cert_name(char * url)
 }
 
 //Esta función está hecha para ser un punto común entre curlw_get y curlw_get_as_text
-int curlw_easy_download(char * url, CurlResponse * curl_response)
+int curlw_easy_download(char * url, CurlResponse * curl_response, int * curl_error_code)
 {
 	fprintf(stderr, "[INFO] curlw_easy_download: Downloading from %s\n", url);
 	CURL * curl;
 	CURLcode curl_result;
+	*curl_error_code = 0;
 
 	curl = curl_easy_init();
 	if(curl == NULL)
@@ -131,6 +132,7 @@ int curlw_easy_download(char * url, CurlResponse * curl_response)
 	if(curl_result != CURLE_OK)
 	{
 		fprintf(stderr, "[ERROR] curlw_easy_download: Failed to easy perform on curl with code %i.\n", curl_result);
+		*curl_error_code = curl_result;
 		return -1;
 	}
 
@@ -139,7 +141,7 @@ int curlw_easy_download(char * url, CurlResponse * curl_response)
 	return 0;
 }
 
-CurlResponse * curlw_get_as_text(char * url)
+CurlResponse * curlw_get_as_text(char * url, int * curl_error_code)
 {
 	CurlResponse * curl_response = new_CurlResponse(1);
 	if(curl_response == NULL)
@@ -148,7 +150,7 @@ CurlResponse * curlw_get_as_text(char * url)
 		return NULL;
 	}
 
-	if(curlw_easy_download(url, curl_response) != 0)
+	if(curlw_easy_download(url, curl_response, curl_error_code) != 0)
 	{
 		fprintf(stderr, "[ERROR] curlw_get_as_text: curlw_easy_download failed.\n");
 		return NULL;
@@ -157,7 +159,7 @@ CurlResponse * curlw_get_as_text(char * url)
 	return curl_response;
 }
 
-CurlResponse * curlw_get(char * url)
+CurlResponse * curlw_get(char * url, int * curl_error_code)
 {
 	CurlResponse * curl_response = new_CurlResponse(0);
 	if(curl_response == NULL)
@@ -166,11 +168,26 @@ CurlResponse * curlw_get(char * url)
 		return NULL;
 	}
 
-	if(curlw_easy_download(url, curl_response) != 0)
+	if(curlw_easy_download(url, curl_response, curl_error_code) != 0)
 	{
 		fprintf(stderr, "[ERROR] curlw_get: curlw_easy_download failed.\n");
 		return NULL;
 	}
 
 	return curl_response;
+}
+
+char * curlw_get_error_message(int curl_error_code)
+{
+	switch(curl_error_code)
+	{
+		case 0: return "Todo salió bien";
+		case 6: return "No se pudo conectar con el servidor.";
+		case 28: return "El servidor tardó demasiado en responder";
+		case 58: return "Parece que los certificados no son válidos.";
+		case 60: return "El servidor no parece seguro.";
+		case 77: return "Parece que los certificados no son válidos o no se puede acceder a ellos.";
+		case 78: return "La URL a la que se intentó acceder parece no ser válida.";
+		default: return "I don't know ._.";
+	}
 }

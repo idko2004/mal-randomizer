@@ -230,12 +230,20 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 
 	fprintf(stderr, "[INFO] url = %s\n", url);
 
-	CurlResponse * mal_page = curlw_get_as_text(url);
+	int curl_error_code = 0;
+	CurlResponse * mal_page = curlw_get_as_text(url, &curl_error_code);
 
+	if(curl_error_code != 0)
+	{
+		char * curl_error_message = curlw_get_error_message(curl_error_code);
+		fprintf(stderr, "[ERROR] download_and_parse_mal: curl failed: %i: %s\n", curl_error_code, curl_error_message);
+		show_error_page(GTK_BUILDER(data_to_parse_mal->builder), curl_error_message);
+		return NULL;
+	}
 	if(mal_page == NULL)
 	{
 		fprintf(stderr, "[ERROR] mal_page is NULL, maybe the download failed.\n");
-		show_error_page(GTK_BUILDER(data_to_parse_mal->builder), "¿La descarga falló?");
+		show_error_page(GTK_BUILDER(data_to_parse_mal->builder), "Aparentemente la descarga falló y no produjo ningún código de error.");
 		return NULL;
 	}
 
