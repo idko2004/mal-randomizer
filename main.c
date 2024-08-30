@@ -40,19 +40,41 @@ void clean()
 	{
 		if(global_data_to_parse_mal->anime_arrays != NULL)
 		{
-			if(global_data_to_parse_mal->anime_arrays->arr_anime_names != NULL) ptrarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_names);
+			if(global_data_to_parse_mal->anime_arrays->arr_anime_names != NULL)
+			{
+				ptrarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_names);
+				global_data_to_parse_mal->anime_arrays->arr_anime_names = NULL;
+			}
 
-			if(global_data_to_parse_mal->anime_arrays->arr_anime_names_eng != NULL) ptrarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_names_eng);
+			if(global_data_to_parse_mal->anime_arrays->arr_anime_names_eng != NULL)
+			{
+				ptrarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_names_eng);
+				global_data_to_parse_mal->anime_arrays->arr_anime_names_eng = NULL;
+			}
 
-			if(global_data_to_parse_mal->anime_arrays->arr_anime_images_paths != NULL) ptrarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_images_paths);
+			if(global_data_to_parse_mal->anime_arrays->arr_anime_images_paths != NULL)
+			{
+				ptrarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_images_paths);
+				global_data_to_parse_mal->anime_arrays->arr_anime_images_paths = NULL;
+			}
 
-			if(global_data_to_parse_mal->anime_arrays->arr_anime_urls != NULL) ptrarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_urls);
+			if(global_data_to_parse_mal->anime_arrays->arr_anime_urls != NULL)
+			{
+				ptrarr_destroy_everything(global_data_to_parse_mal->anime_arrays->arr_anime_urls);
+				global_data_to_parse_mal->anime_arrays->arr_anime_urls = NULL;
+			}
 
 			free(global_data_to_parse_mal->anime_arrays);
+			global_data_to_parse_mal->anime_arrays = NULL;
 		}
+
+		free(global_data_to_parse_mal);
+		global_data_to_parse_mal = NULL;
 	}
 
 	curl_global_cleanup();
+
+	index_anime = -1;
 }
 
 void show_error_page(GtkBuilder * builder, char * error)
@@ -408,6 +430,14 @@ void click_reroll_button(GtkWidget * widget, void * callback_arg)
 	pthread_detach(thread_id);
 }
 
+void click_error_button(GtkWidget * widget, void * callback_arg)
+{
+	GtkBuilder * builder = GTK_BUILDER(callback_arg);
+	clean();
+
+	
+}
+
 int main(int argc, char ** argv)
 {
 	fprintf(stderr, "hi :3\n");
@@ -437,7 +467,7 @@ int main(int argc, char ** argv)
 	g_signal_connect(browser_button, "clicked", G_CALLBACK(open_anime_in_browser), NULL);
 
 	GObject * error_button = gtk_builder_get_object(GTK_BUILDER(builder), "errorButton");
-	g_signal_connect(error_button, "clicked", G_CALLBACK(gtk_main_quit), NULL);
+	g_signal_connect(error_button, "clicked", G_CALLBACK(click_error_button), builder);
 
 	gtk_main();
 
