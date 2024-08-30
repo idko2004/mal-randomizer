@@ -12,6 +12,6 @@ typedef struct
 	Ptrarr * arr_anime_images_paths;
 } AnimeArrays;
 
-AnimeArrays * process_anime(cJSON * mal_data_items_json);
+AnimeArrays * process_anime(cJSON * mal_data_items_json, int * error);
 
 #endif

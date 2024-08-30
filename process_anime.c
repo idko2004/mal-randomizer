@@ -9,15 +9,18 @@
 
 #include "ptrarr.h"
 
-AnimeArrays * process_anime(cJSON * mal_data_items_json) //Guarda los animes del json en varias arrays
+AnimeArrays * process_anime(cJSON * mal_data_items_json, int * error) //Guarda los animes del json en varias arrays
 {
-	Ptrarr * arr_anime_names = ptrarr_new(10);
-	Ptrarr * arr_anime_names_eng = ptrarr_new(10);
-	Ptrarr * arr_anime_urls = ptrarr_new(10);
-	Ptrarr * arr_anime_images_paths = ptrarr_new(10);
+	*error = 0;
+
+	Ptrarr * arr_anime_names = ptrarr_new(50);
+	Ptrarr * arr_anime_names_eng = ptrarr_new(50);
+	Ptrarr * arr_anime_urls = ptrarr_new(50);
+	Ptrarr * arr_anime_images_paths = ptrarr_new(50);
 	if(arr_anime_names == NULL || arr_anime_urls == NULL || arr_anime_images_paths == NULL)
 	{
 		fprintf(stderr, "[INFO] process_anime: Failed to create Ptrarr.\n");
+		*error = 1;
 		return NULL;
 	}
 
@@ -40,6 +43,7 @@ AnimeArrays * process_anime(cJSON * mal_data_items_json) //Guarda los animes del
 		if(anime_title == NULL || anime_title_eng == NULL || anime_url == NULL || anime_image_path == NULL)
 		{
 			fprintf(stderr, "[ERROR] process_anime: Failed to get object item in json.\n");
+			*error = 2;
 			return NULL;
 		}
 
@@ -49,6 +53,7 @@ AnimeArrays * process_anime(cJSON * mal_data_items_json) //Guarda los animes del
 		if(anime_name_jp_copy == NULL)
 		{
 			fprintf(stderr, "[ERROR] process_anime: Failed to allocate space to copy string.\n");
+			*error = 1;
 			return NULL;
 		}
 		strcpy(anime_name_jp_copy, anime_title->valuestring);
@@ -61,6 +66,7 @@ AnimeArrays * process_anime(cJSON * mal_data_items_json) //Guarda los animes del
 			if(anime_name_en_copy == NULL)
 			{
 				fprintf(stderr, "[ERROR] process_anime: Failed to allocate space to copy string.\n");
+				*error = 1;
 				return NULL;
 			}
 			strcpy(anime_name_en_copy, anime_title->valuestring);
@@ -72,6 +78,7 @@ AnimeArrays * process_anime(cJSON * mal_data_items_json) //Guarda los animes del
 			if(anime_name_en_copy == NULL)
 			{
 				fprintf(stderr, "[ERROR] process_anime: Failed to allocate space to copy string.\n");
+				*error = 1;
 				return NULL;
 			}
 			strcpy(anime_name_en_copy, anime_title_eng->valuestring);
@@ -82,6 +89,7 @@ AnimeArrays * process_anime(cJSON * mal_data_items_json) //Guarda los animes del
 		if(anime_url_copy == NULL)
 		{
 			fprintf(stderr, "[ERROR] process_anime: Failed to allocate space to copy string.\n");
+			*error = 1;
 			return NULL;
 		}
 		strcpy(anime_url_copy, anime_url->valuestring);
@@ -91,6 +99,7 @@ AnimeArrays * process_anime(cJSON * mal_data_items_json) //Guarda los animes del
 		if(image_path_copy == NULL)
 		{
 			fprintf(stderr, "[ERROR] process_anime: Failed to allocate space to copy string.\n");
+			*error = 1;
 			return NULL;
 		}
 		strcpy(image_path_copy, anime_image_path->valuestring);
@@ -99,6 +108,7 @@ AnimeArrays * process_anime(cJSON * mal_data_items_json) //Guarda los animes del
 		if(push_result > 0)
 		{
 			fprintf(stderr, "[ERROR] process_anime: Failed to push to ptrarr %i times.\n", push_result);
+			*error = 1;
 			return NULL;
 		}
 
@@ -122,6 +132,13 @@ AnimeArrays * process_anime(cJSON * mal_data_items_json) //Guarda los animes del
 	//strarr_print_all(arr_anime_names_eng);
 
 	AnimeArrays * result = malloc(sizeof(AnimeArrays));
+	if(result == NULL)
+	{
+		fprintf(stderr, "[ERROR] process_anime: Failed to allocate space for AnimeArrays.\n");
+		*error = 1;
+		return NULL;
+	}
+
 	result->arr_anime_names = arr_anime_names;
 	result->arr_anime_names_eng = arr_anime_names_eng;
 	result->arr_anime_images_paths = arr_anime_images_paths;

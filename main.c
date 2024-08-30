@@ -9,6 +9,7 @@
 
 #include "cJSON/cJSON.h"
 
+#include "glib.h"
 #include "ptrarr.h"
 #include "ui/gtk_builder_ui.h"
 #include "curl_wrapper.h"
@@ -82,10 +83,13 @@ void show_error_page(GtkBuilder * builder, char * error)
 	GObject * stack = gtk_builder_get_object(builder, "stack");
 	GObject * page_error = gtk_builder_get_object(builder, "pageError");
 	GObject * label_error = gtk_builder_get_object(builder, "errorLabel");
+	GObject * error_button = gtk_builder_get_object(builder, "errorButton");
 	
 	gtk_label_set_text(GTK_LABEL(label_error), error);
 	
 	gtk_stack_set_visible_child(GTK_STACK(stack), GTK_WIDGET(page_error));
+
+	gtk_widget_set_sensitive(GTK_WIDGET(error_button), TRUE);
 }
 
 int open_anime_in_browser()
@@ -313,11 +317,27 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 	}
 	fprintf(stderr, "[INFO] json parsed.\n");
 
-	AnimeArrays * anime_arrays = process_anime(mal_json);
+	int process_anime_error = 0;
+	AnimeArrays * anime_arrays = process_anime(mal_json, &process_anime_error);
+	if(anime_arrays == NULL || process_anime_error != 0) //Ha ocurrido un error al procesar el json
+	{
+		char * error_message = NULL;
+		switch(process_anime_error)
+		{
+			case 1: error_message = "No hay memoria suficiente."; break;
+			case 2: error_message = "No se pudo procesar la lista de animes.\nEs posible que la lista esté vacía."; break;
+			default: error_message = "Algo salió mal procesando la lista de animes."; break;
+		}
 
-	data_to_parse_mal->anime_arrays = anime_arrays;
+		fprintf(stderr, "[WARN] download_and_parse_mal: %s\n", error_message);
+		show_error_page(GTK_BUILDER(data_to_parse_mal->builder), error_message);
+	}
+	else //El json ha sido procesado exitosamente
+	{
+		data_to_parse_mal->anime_arrays = anime_arrays;
 
-	change_page_and_show_result(data_to_parse_mal);
+		change_page_and_show_result(data_to_parse_mal);
+	}
 
 	free(url);
 	free(mal_data_items);
@@ -432,7 +452,10 @@ void click_reroll_button(GtkWidget * widget, void * callback_arg)
 
 void click_error_button(GtkWidget * widget, void * callback_arg)
 {
+	gtk_widget_set_sensitive(widget, FALSE);
+
 	GtkBuilder * builder = GTK_BUILDER(callback_arg);
+
 	clean();
 
 	GObject * stack = gtk_builder_get_object(builder, "stack");
