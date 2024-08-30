@@ -435,7 +435,13 @@ void click_error_button(GtkWidget * widget, void * callback_arg)
 	GtkBuilder * builder = GTK_BUILDER(callback_arg);
 	clean();
 
-	
+	GObject * stack = gtk_builder_get_object(builder, "stack");
+	GObject * page1 = gtk_builder_get_object(builder, "page1");
+	gtk_stack_set_transition_type(GTK_STACK(stack), GTK_STACK_TRANSITION_TYPE_SLIDE_RIGHT);
+	gtk_stack_set_visible_child(GTK_STACK(stack), GTK_WIDGET(page1));
+
+	GObject * goButton = gtk_builder_get_object(builder, "goButton");
+	gtk_widget_set_sensitive(GTK_WIDGET(goButton), TRUE);
 }
 
 int main(int argc, char ** argv)
