@@ -144,6 +144,8 @@ int show_random_anime()
 
 	char * jp_name = replace_all("&#039;", "'", jp_name_bad);
 	char * en_name = replace_all("&#039;", "'", en_name_bad);
+	jp_name = replace_all("&amp;", "&", jp_name);
+	en_name = replace_all("&amp;", "&", en_name);
 
 	fprintf(stderr, "[INFO] anime name jp fixed: %s\n", jp_name);
 	fprintf(stderr, "[INFO] anime name en fixed: %s\n", en_name);
