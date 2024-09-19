@@ -416,12 +416,13 @@ void click_go_button(GtkWidget * widget, void * callback_arg)
 		return;
 	}
 
+	if(list_selected == 0) list_selected = 7; //Por algún motivo cambiaron all animes de 0 a 7
 	if(list_selected == 5) list_selected = 6; //Por algún motivo, en myanimelist el status 5 está vacío.
 	fprintf(stderr, "[INFO] username: %s\n[INFO] list: %i\n", username, list_selected);
 
 	//Hacer la transición
-	gtk_spinner_start(GTK_SPINNER(spinner));
 	gtk_stack_set_visible_child(GTK_STACK(stack), GTK_WIDGET(page2));
+	gtk_spinner_start(GTK_SPINNER(spinner));
 
 	//Crear la estructura en la que se van a guardar los datos
 	DataToParseMal * data_to_parse_mal = malloc(sizeof(DataToParseMal));
