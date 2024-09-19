@@ -9,7 +9,6 @@
 
 #include "cJSON/cJSON.h"
 
-#include "glib.h"
 #include "ptrarr.h"
 #include "ui/gtk_builder_ui.h"
 #include "curl_wrapper.h"
@@ -23,11 +22,11 @@
 
 typedef struct
 {
-	const char * username; //in
-	int status; //in
-	GtkBuilder * builder; //in
-	pthread_t thread_id; //in
-	AnimeArrays * anime_arrays; //out
+	const char * username;
+	int status;
+	GtkBuilder * builder;
+	pthread_t thread_id;
+	AnimeArrays * anime_arrays;
 } DataToParseMal;
 
 DataToParseMal * global_data_to_parse_mal = NULL;
@@ -470,6 +469,21 @@ void click_error_button(GtkWidget * widget, void * callback_arg)
 	gtk_widget_set_sensitive(GTK_WIDGET(goButton), TRUE);
 }
 
+void click_back_button(GtkWidget * widget, void * callback_arg)
+{
+	GtkBuilder * builder = GTK_BUILDER(callback_arg);
+
+	clean();
+
+	GObject * stack = gtk_builder_get_object(builder, "stack");
+	GObject * page1 = gtk_builder_get_object(builder, "page1");
+	gtk_stack_set_transition_type(GTK_STACK(stack), GTK_STACK_TRANSITION_TYPE_SLIDE_RIGHT);
+	gtk_stack_set_visible_child(GTK_STACK(stack), GTK_WIDGET(page1));
+
+	GObject * goButton = gtk_builder_get_object(builder, "goButton");
+	gtk_widget_set_sensitive(GTK_WIDGET(goButton), TRUE);
+}
+
 int main(int argc, char ** argv)
 {
 	fprintf(stderr, "hi :3\n");
@@ -500,6 +514,9 @@ int main(int argc, char ** argv)
 
 	GObject * error_button = gtk_builder_get_object(GTK_BUILDER(builder), "errorButton");
 	g_signal_connect(error_button, "clicked", G_CALLBACK(click_error_button), builder);
+
+	GObject * back_button = gtk_builder_get_object(GTK_BUILDER(builder), "resultScreenBackButton");
+	g_signal_connect(back_button, "clicked", G_CALLBACK(click_back_button), builder);
 
 	gtk_main();
 
