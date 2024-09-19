@@ -216,10 +216,12 @@ int show_result_page_spinner(GtkBuilder * builder, int show)
 {
 	GObject * spinner = gtk_builder_get_object(builder, "resultPageSpinner");
 	GObject * resultPage = gtk_builder_get_object(builder, "resultScreenShow");
+	GObject * resultPageBackBox = gtk_builder_get_object(builder, "resultScreenBackBox");
 
 	if(show == 0) //0 = show
 	{
 		gtk_widget_set_visible(GTK_WIDGET(resultPage), FALSE);
+		gtk_widget_set_visible(GTK_WIDGET(resultPageBackBox), FALSE);
 		gtk_widget_set_visible(GTK_WIDGET(spinner), TRUE);
 		gtk_spinner_start(GTK_SPINNER(spinner));
 	}
@@ -228,6 +230,7 @@ int show_result_page_spinner(GtkBuilder * builder, int show)
 		gtk_spinner_stop(GTK_SPINNER(spinner));
 		gtk_widget_set_visible(GTK_WIDGET(spinner), FALSE);
 		gtk_widget_set_visible(GTK_WIDGET(resultPage), TRUE);
+		gtk_widget_set_visible(GTK_WIDGET(resultPageBackBox), TRUE);
 	}
 	else
 	{
