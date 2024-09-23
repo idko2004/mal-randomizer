@@ -3,7 +3,7 @@ if [[ "${OS}" == "Windows_NT" ]]; then
 	# Es windows
 	BUILD="build/Windows/bin"
 	MATERIALS="build/materials"
-	COMPILE_FLAGS_MAIN="-Wall -Werror -ggdb"
+	COMPILE_FLAGS_MAIN="-Wall -Werror -ggdb -mwindows"
 	PLATFORM_SPECIFIC_OBJ="${MATERIALS}/windres.o"
 else
 	# No es windows, probablemente sea linux
