@@ -260,8 +260,13 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 
 	fprintf(stderr, "[INFO] url = %s\n", url);
 
+	CurlRequest * request = new_CurlRequest();
+	request->url = url;
+	request->method = CURLW_METHOD_GET;
+	request->response_is_text = 1;
+
 	int curl_error_code = 0;
-	CurlResponse * mal_page = curlw_get_as_text(url, &curl_error_code);
+	CurlResponse * mal_page = curlw_go(request, &curl_error_code);
 
 	if(curl_error_code != 0)
 	{
@@ -279,8 +284,8 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 
 	//printf("%s", mal_page->content);
 
-	long int mal_data_items_start = find_in_text("data-items=\"", mal_page->content, 0);
-	long int mal_data_items_end = find_in_text("\" data-broadcasts", mal_page->content, mal_data_items_start);
+	long int mal_data_items_start = find_in_text("data-items=\"", mal_page->body->content, 0);
+	long int mal_data_items_end = find_in_text("\" data-broadcasts", mal_page->body->content, mal_data_items_start);
 	if(mal_data_items_start == -1 || mal_data_items_end == -1)
 	{
 		fprintf(stderr, "[ERROR] main: Failed to find start or end of data items.\n");
@@ -288,7 +293,7 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 		return NULL;
 	}
 
-	char * mal_data_items = slice_text(mal_data_items_start + strlen("data-items=\""), mal_data_items_end, mal_page->content);
+	char * mal_data_items = slice_text(mal_data_items_start + strlen("data-items=\""), mal_data_items_end, mal_page->body->content);
 	if(mal_data_items == NULL)
 	{
 		fprintf(stderr, "[ERROR] main: Failed to slice data items.\n");
