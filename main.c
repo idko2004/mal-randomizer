@@ -282,7 +282,7 @@ void * download_and_parse_mal(void * data_to_parse_mal_ptr)
 		return NULL;
 	}
 
-	//printf("%s", mal_page->content);
+	//printf("###BODY CONTENTS:\n%s\n###", (char *) mal_page->body->content);
 
 	long int mal_data_items_start = find_in_text("data-items=\"", mal_page->body->content, 0);
 	long int mal_data_items_end = find_in_text("\" data-broadcasts", mal_page->body->content, mal_data_items_start);

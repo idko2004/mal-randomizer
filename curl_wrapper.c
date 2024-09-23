@@ -1,5 +1,6 @@
 #include "curl_wrapper.h"
 
+#include <curl/easy.h>
 #include <curl/urlapi.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,6 +13,7 @@
 #define USER_AGENT "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 GLS/100.10.9939.100"
 #define MAIN_PAGE_CERT_FILE "certs/myanimelist-net.pem";
 #define CDN_CERT_FILE "certs/cdn-myanimelist-net.pem";
+#define RETRY_AS_HTTP_IF_HTTPS_FAILS 0
 
 CurlRequest * new_CurlRequest()
 {
@@ -184,6 +186,15 @@ int curlw_easy_download(CURLU * url, int method, char * body_contents, char * co
 		return -1;
 	}
 
+	//Comprobar si estamos usando https
+	char * scheme;
+	if(curl_url_get(url, CURLUPART_SCHEME, &scheme, 0) != CURLUE_OK)
+	{
+		fprintf(stderr, "[ERROR] curlw_easy_download: Failed to get url scheme.\n");
+		return -1;
+	}
+	fprintf(stderr, "[INFO] curlw_easy_download: Using %s scheme.\n", scheme);
+
 	//Poner User Agent
 	if(curl_easy_setopt(curl, CURLOPT_USERAGENT, USER_AGENT) != CURLE_OK)
 	{
@@ -253,13 +264,16 @@ int curlw_easy_download(CURLU * url, int method, char * body_contents, char * co
 	}
 	
 	#ifdef _WIN32
-		//Abrir certificado CA de myanimelist.net sino no se puede establecer una conexión HTTPS en windows por algún motivo
-		fprintf(stderr, "[INFO] curlw_easy_download: Setting CURLOPT_CAINFO.\n");
-
-		if(curl_easy_setopt(curl, CURLOPT_CAINFO, get_cert_name(url)) != CURLE_OK)
+	//Abrir certificado CA de myanimelist.net sino no se puede establecer una conexión HTTPS en windows por algún motivo
+		if(strcmp(scheme, "https") == 0)
 		{
-			fprintf(stderr, "[ERROR] curlw_easy_download: Failed to set option to curl: CURLOPT_CAINFO.\n");
-			return -1;
+			fprintf(stderr, "[INFO] curlw_easy_download: Setting CURLOPT_CAINFO.\n");
+
+			if(curl_easy_setopt(curl, CURLOPT_CAINFO, get_cert_name(full_url)) != CURLE_OK)
+			{
+				fprintf(stderr, "[ERROR] curlw_easy_download: Failed to set option to curl: CURLOPT_CAINFO.\n");
+				return -1;
+			}
 		}
 	#endif
 
@@ -267,14 +281,29 @@ int curlw_easy_download(CURLU * url, int method, char * body_contents, char * co
 	*curl_error_code = curl_result;
 	if(curl_result != CURLE_OK)
 	{
-		fprintf(stderr, "[ERROR] curlw_easy_download: Failed to easy perform on curl with code %i.\n", curl_result);
-		return -1;
+		if(RETRY_AS_HTTP_IF_HTTPS_FAILS == 1 &&curl_result == CURLE_SSL_CACERT_BADFILE && strcmp(scheme, "https") == 0) //Try again but with http only if it's active
+		{
+			curl_easy_cleanup(curl);
+			if(curl_url_set(url, CURLUPART_SCHEME, "http", 0) != CURLUE_OK)
+			{
+				fprintf(stderr, "[ERROR] curlw_easy_download: Failed to change url scheme to do recursive stuff.\n");
+				return -1;
+			}
+			return curlw_easy_download(url, method, body_contents, cookies, referer, curl_response, curl_error_code);
+		}
+		else //Something else failed
+		{
+			fprintf(stderr, "[ERROR] curlw_easy_download: Failed to easy perform on curl with code %i.\n", curl_result);
+			return -1;
+		}
 	}
 
 	fprintf(stderr, "[INFO] curlw_easy_download: Looks like the download from %s succeeded.\n", full_url);
 
 	curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &curl_response->httpCode);
 
+	curl_free(scheme);
+	curl_free(full_url);
 	curl_easy_cleanup(curl);
 
 	return 0;
