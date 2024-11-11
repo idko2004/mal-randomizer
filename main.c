@@ -39,7 +39,8 @@ void clean()
 
 	if(current_anime_picture != NULL)
 	{
-		free_ImageForGtk(current_anime_picture);
+		free_loader_and_struct_of_ImageForGtk(current_anime_picture);
+		current_anime_picture = NULL;
 	}
 
 	if(global_data_to_parse_mal != NULL)
@@ -197,10 +198,16 @@ int show_random_anime()
 		if(anime_picture != NULL)
 		{
 			GObject * gtk_image = gtk_builder_get_object(GTK_BUILDER(data_to_parse_mal->builder), "animeImage");
+
+			fprintf(stderr, "[INFO] show_random_anime: setting image.\n");
 			gtk_image_set_from_pixbuf(GTK_IMAGE(gtk_image), anime_picture->pixbuf);
 
 			//Clean previous image
-			if(current_anime_picture != NULL) free_ImageForGtk(current_anime_picture);
+			if(current_anime_picture != NULL)
+			{
+				fprintf(stderr, "[INFO] show_random_anime: freeing previous image.\n");
+				free_loader_and_struct_of_ImageForGtk(current_anime_picture);
+			}
 			current_anime_picture = anime_picture;
 		}
 		else fprintf(stderr, "[ERROR] show_random_anime: Failed to obtain new picture, probably old picture will be shown.\n");

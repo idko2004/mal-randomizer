@@ -13,6 +13,7 @@ typedef struct
 
 ImageForGtk * new_ImageForGtk();
 void free_ImageForGtk(ImageForGtk * image_for_gtk);
+void free_loader_and_struct_of_ImageForGtk(ImageForGtk * image_for_gtk);
 
 ImageForGtk * get_pixbuf_from_url(char * image_url);
 Ptrarr * get_multiple_pixbufs_from_urls(Ptrarr * arr_images_urls);

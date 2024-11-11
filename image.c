@@ -38,6 +38,16 @@ void free_ImageForGtk(ImageForGtk * image_for_gtk)
 	free(image_for_gtk);
 }
 
+void free_loader_and_struct_of_ImageForGtk(ImageForGtk * image_for_gtk)
+{
+	if(image_for_gtk->pixbuf_loader != NULL)
+	{
+		g_object_unref(image_for_gtk->pixbuf_loader);
+	}
+
+	free(image_for_gtk);
+}
+
 CurlResponse * download_image(char * image_url)
 {
 	CurlRequest * request = new_CurlRequest();
