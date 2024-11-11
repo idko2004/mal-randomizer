@@ -30,11 +30,17 @@ typedef struct
 } DataToParseMal;
 
 DataToParseMal * global_data_to_parse_mal = NULL;
+ImageForGtk * current_anime_picture = NULL;
 int index_anime = -1;
 
 void clean()
 {
 	fprintf(stderr, "[INFO] Cleaning up.\n");
+
+	if(current_anime_picture != NULL)
+	{
+		free_ImageForGtk(current_anime_picture);
+	}
 
 	if(global_data_to_parse_mal != NULL)
 	{
@@ -135,6 +141,8 @@ int open_anime_in_browser()
 
 int show_random_anime()
 {
+	fprintf(stderr, "[INFO] show_random_anime is here!\n");
+
 	DataToParseMal * data_to_parse_mal = global_data_to_parse_mal;
 
 	if(data_to_parse_mal == NULL)
@@ -184,7 +192,18 @@ int show_random_anime()
 	char * image_url = ptrarr_get(data_to_parse_mal->anime_arrays->arr_anime_images_paths, i);
 	if(image_url != NULL || strcmp(image_url, "\0") != 0)
 	{
-		download_and_show_image(image_url, data_to_parse_mal->builder);
+		fprintf(stderr, "[INFO] show_random_anime: getting image.\n");
+		ImageForGtk * anime_picture = get_pixbuf_from_url(image_url);
+		if(anime_picture != NULL)
+		{
+			GObject * gtk_image = gtk_builder_get_object(GTK_BUILDER(data_to_parse_mal->builder), "animeImage");
+			gtk_image_set_from_pixbuf(GTK_IMAGE(gtk_image), anime_picture->pixbuf);
+
+			//Clean previous image
+			if(current_anime_picture != NULL) free_ImageForGtk(current_anime_picture);
+			current_anime_picture = anime_picture;
+		}
+		else fprintf(stderr, "[ERROR] show_random_anime: Failed to obtain new picture, probably old picture will be shown.\n");
 	}
 	else fprintf(stderr, "[WARN] Failed to get image url.\n");
 
